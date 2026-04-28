@@ -1,0 +1,307 @@
+/* ----------------------------------------------------------------- */
+/* root-elemtet: definerer farver og typografi for hele applikationen, så det kan ændres et sted mens det opdatere over alt. */
+:root {
+  --farve-moerk-groen: #0a2416;
+  --farve-lys-graa: #f5f5f3;
+  --farve-moerk-footer: #1e1e1e;
+  --farve-hvid: #ffffff;
+  --farve-tekst-moerk: #111111;
+  --farve-tekst-graa: #555555;
+
+  --skrift-serif: Georgia, 'Times New Roman', serif;
+
+  --farve-accent: #9a7b2f;
+  --farve-accent-hover: #b08f38;
+}
+
+/* ----------------------------------------------------------------- */
+/* Fjerner browserens standardmargins og sætter box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--skrift-serif);
+  color: var(--farve-tekst-moerk);
+  background-color: var(--farve-hvid);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ----------------------------------------------------------------- */
+/* navbaren*/
+.navbar {
+  position: fixed; /* position: fixed kombineret med top: 0 holder navbaren i toppen af skærmen når man scroller. */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100; /* z-index: bruges som "lag", altså hvis den sættes til 100 sikres det, at navbaren ligger oven på alt andet indhold når man scroller forbi sektioner. */
+  background-color: var(--farve-moerk-groen);
+  display: flex; /* display: flex med justify-content: space-between placerer de tre elementer, logo, links og bruger-knap, med maksimal afstand imellem sig. */
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 72px;
+}
+
+.navbar-logo img {
+  height: 50px;
+  width: auto;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 40px; /* giver ensartet afstand mellem hvert navigationspunkt uden at vi skal sætte margin på hvert enkelt <li>. */
+  list-style: none;
+}
+
+.navbar-links a {
+  color: var(--farve-hvid);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 4px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.navbar-links a:hover {
+  color: var(--farve-accent-hover);
+  border-bottom-color: var(--farve-accent-hover);
+}
+
+.navbar-bruger-knap {
+  color: var(--farve-hvid);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--farve-hvid);
+  padding: 8px 20px;
+}
+
+.navbar-bruger-knap:hover {
+  color: var(--farve-accent-hover);
+  border-color: var(--farve-accent-hover);
+  opacity: 1;
+}
+
+/* ----------------------------------------------------------------- */
+/* hero elementet: "Velkommen til EIA og adressesøgningen findes her */
+.hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+  overflow: hidden;
+}
+
+.hero-baggrund {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(30, 30, 30, 0.7) 0%, rgba(30, 30, 30, 0.2) 60%, rgba(30, 30, 30, 0) 100%);
+  z-index: 0;
+}
+
+.hero-titel,
+.hero-soegefelt,
+.soege-resultater {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-titel {
+  font-family: var(--skrift-serif);
+  font-size: 3.5rem;
+  font-weight: normal;
+  color: var(--farve-hvid);
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.2;
+}
+
+.hero-soeg-wrapper {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 660px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-soegefelt {
+  flex: 1;
+  max-width: none;
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-family: var(--skrift-serif);
+  border: none;
+  border-radius: 8px;
+  background-color: var(--farve-lys-graa);
+  color: var(--farve-tekst-moerk);
+  outline: none;
+}
+
+.hero-soegefelt::placeholder {
+  color: var(--farve-tekst-graa);
+}
+
+.hero-soeg-knap {
+  background-color: var(--farve-accent);
+  color: var(--farve-hvid);
+  font-family: var(--skrift-serif);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  border: none;
+  border-radius: 8px;
+  padding: 0 28px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hero-soeg-knap:hover {
+  background-color: var(--farve-accent-hover);
+}
+
+.soege-resultater { /* er stadig tom i HTML, men CSS'en er klar til at JavaScript dynamisk tilføjer resultater som <li>-elementer. */
+  width: 100%;
+  max-width: 600px;
+  list-style: none;
+  background-color: var(--farve-hvid);
+  margin-top: 2px;
+}
+
+.soege-resultater li {
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--farve-tekst-moerk);
+  border-bottom: 1px solid var(--farve-lys-graa);
+}
+
+.soege-resultater li:hover {
+  background-color: var(--farve-lys-graa);
+}
+
+/* ----------------------------------------------------------------- */
+/* Indhold: "Sådan fungerer det"-sektionen */
+
+.indhold {
+  background-color: var(--farve-lys-graa);
+  padding: 80px 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.indhold-titel {
+  font-family: var(--skrift-serif);
+  font-size: 2rem;
+  font-weight: normal;
+  color: var(--farve-tekst-moerk);
+  margin-bottom: 40px;
+}
+
+.indhold-divider {
+  border: none;
+  border-top: 1px solid var(--farve-accent);
+  width: 100%;
+}
+
+/* ----------------------------------------------------------------- */
+/* Footeren */
+
+.footer {
+  background-color: var(--farve-moerk-footer);
+  padding: 60px 40px 0 40px;
+}
+
+.footer-indhold {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 60px;
+  padding-bottom: 40px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.footer-logo-sektion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.footer-logo {
+  height: 48px;
+  width: auto;
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: var(--farve-tekst-graa);
+}
+
+.footer-kolonne {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-overskrift {
+  font-family: var(--skrift-serif);
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  color: var(--farve-hvid);
+}
+
+.footer-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.footer-liste li {
+  font-size: 0.9rem;
+  color: var(--farve-tekst-graa);
+}
+
+.footer-liste a {
+  color: var(--farve-tekst-graa);
+}
+
+.footer-liste a:hover {
+  color: var(--farve-hvid);
+}
+
+.footer-streg {
+  border-top: 1px solid #333333;
+  padding: 20px ;
+  padding: 20px 100px 20px 100px;
+}
