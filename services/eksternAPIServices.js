@@ -4,11 +4,11 @@ Al ekstern kommunikation går gennem denne fil. */
 
 /* funktionen der henter en adresse fra DAWA-api'et */
 async function hentAdresse(søgning) { /* async: netværkskald tager tid */
-    const url = `https://api.dataforsyningen.dk/autocomplete?q=${encodeURIComponent(søgetekst)}&type=adresse`; /* bygger URL'en til DAWA's autocomplete-endpoint. encodeURIComponent() bruges fordi brugerens søgning kan indeholde mellemrum, æ, ø, å eller andre tegn der skal kodes korrekt for at virke i en URL.*/
+    const url = `https://api.dataforsyningen.dk/autocomplete?q=${encodeURIComponent(søgning)}&type=adresse`; /* bygger URL'en til DAWA's autocomplete-endpoint. encodeURIComponent() bruges fordi brugerens søgning kan indeholde mellemrum, æ, ø, å eller andre tegn der skal kodes korrekt for at virke i en URL.*/
 
     const response = await fetch(url); /* sender HTTP-requesten til DAWA og venter på svar. */
 
-    if (!reponse.ok) { /* Fejhåndtering: hvis svaret vi fetcher fra DAWA ikke er ok, sender vi en fejl tilbage */
+    if (!response.ok) { /* Fejhåndtering: hvis svaret vi fetcher fra DAWA ikke er ok, sender vi en fejl tilbage */
         throw new Error(`DAWA-API fejl: ${response.status}`);
     }
 
