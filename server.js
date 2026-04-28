@@ -2,13 +2,20 @@
 const express = require('express'); /* importerer Express-frameworket. */
 const path = require('path'); /* importerer Node.js' indbyggede path-modul */
 
+/* importere routeren i server.js */
+const adresseRoute = require('./routes/adresse');
+
 const app = express(); /* opretter selve Express-applikationen. app er objektet vi hænger alle routes og middleware på. */
 const PORT = 3000; /* vi sætter porten til at være 3000, så når vi skal hoste kommer det på http://localhost:3000 */
 
 app.use(express.json()); /*  */
 app.use(express.static(path.join(__dirname, 'public'))); /* vi sætter den statiske visning til de ting der ligger i public-mappen */
 
+/* Det betyder at routerens interne /søg bliver tilgængelig på /api/adresse/søg. 
+Præfikset /api/ er konvention for at adskille API-endpoints fra HTML-sider. */
+app.use('/api/adresse', adresseRoute);
+
+
 app.listen(PORT, () => {
     console.log(`EIA-server kører på http://localhost:${PORT}`);
 });
-
