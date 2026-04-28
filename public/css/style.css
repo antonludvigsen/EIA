@@ -192,6 +192,8 @@ a {
   list-style: none;
   background-color: var(--farve-hvid);
   margin-top: 2px;
+  max-height: 300px; /* maksimal højde */
+  overflow-y: auto; /* scroll inden for listen hvis den overstiger max-height */
 }
 
 .soege-resultater li {
