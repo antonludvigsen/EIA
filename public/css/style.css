@@ -307,3 +307,92 @@ a {
   padding: 20px ;
   padding: 20px 100px 20px 100px;
 }
+
+/* ----------------------------------------------------------------- */
+/* Ejendomsprofil (stylingen bygger videre på forside elementerne, hvor vi adder de ting der specifikt skal bruges til denne del af siden */
+
+.ejendom-sektion {
+  min-height: 100vh;
+  background-color: var(--farve-moerk-groen);
+  padding: 120px 80px 80px 80px;
+}
+
+.ejendom-header {
+  margin-bottom: 40px;
+}
+
+.ejendom-adresse {
+  font-family: var(--skrift-serif);
+  font-size: 2.5rem;
+  font-weight: normal;
+  color: var(--farve-hvid);
+  margin-bottom: 40px;
+}
+
+.ejendom-indhold {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.ejendom-data-kort {
+  background-color: var(--farve-hvid);
+  padding: 40px;
+  flex: 1;
+}
+
+.ejendom-data-titel {
+  font-family: var(--skrift-serif);
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: var(--farve-tekst-moerk);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--farve-accent);
+}
+
+.ejendom-data-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ejendom-data-felt {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--farve-lys-graa);
+}
+
+.ejendom-data-label {
+  font-size: 0.9rem;
+  color: var(--farve-tekst-graa);
+}
+
+.ejendom-data-vaerdi {
+  font-size: 0.9rem;
+  color: var(--farve-tekst-moerk);
+  font-weight: bold;
+}
+
+.ejendom-handlinger {
+  display: flex;
+  gap: 16px;
+}
+
+.ejendom-gem-knap {
+  background-color: var(--farve-accent);
+  color: var(--farve-hvid);
+  font-family: var(--skrift-serif);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  border: none;
+  padding: 16px 40px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ejendom-gem-knap:hover {
+  background-color: var(--farve-accent-hover);
+}
