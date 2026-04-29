@@ -10,6 +10,9 @@ function validerSoegeTekst(søgetekst) {
     }
 };
 
+/* TEST */
+
+
 async function findAdresse(req, res) { /* modtager Express request og response objekter. 
     req = indkommende HTTP-request (URL, parametre, body). 
     res = sende svar tilbage til browseren */
