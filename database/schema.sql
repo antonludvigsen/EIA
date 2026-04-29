@@ -122,3 +122,14 @@ CREATE TABLE SammenligningCase (
     sammenligningID     INT NOT NULL FOREIGN KEY REFERENCES Sammenligning(sammenligningID),
     investeringscaseID  INT NOT NULL FOREIGN KEY REFERENCES Investeringscase(investeringscaseID)
 );
+
+/* --- TEST AF DB --- */
+
+/* Verificer at alle tabeller eksisterer */
+SELECT TABLE_NAME 
+FROM INFORMATION_SCHEMA.TABLES 
+WHERE TABLE_TYPE = 'BASE TABLE'
+ORDER BY TABLE_NAME;
+
+/* Verificer at hardcodet bruger er oprettet */
+SELECT * FROM Bruger;
