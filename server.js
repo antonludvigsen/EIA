@@ -20,10 +20,10 @@ app.listen(PORT, () => {
     console.log(`EIA-server kører på http://localhost:${PORT}`);
 });
 
-/* TEST af forbindelse til databasen når serveren startes */
-
+/* TEST af forbindelse til databasen når serveren startes
 const { poolForbindelse } = require('./database/connection');
 
 poolForbindelse
     .then(() => console.log('Furbundet til Azure SQL'))
     .catch(fejl => console.error('Databasefejl:', fejl));
+*/
