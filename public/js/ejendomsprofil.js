@@ -53,11 +53,11 @@ class EjendomsprofilUI {
                 ejendomstypeTekst = 'Ikke registreret';
             }
 
-            let byggeaarTekst;
-            if (data.bbr.byggeaar) {
-                byggeaarTekst = data.bbr.byggeaar;
+            let byggeårTekst;
+            if (data.bbr.byggeår) {
+                byggeårTekst = data.bbr.byggeår;
             } else {
-                byggeaarTekst = 'Ikke registreret';
+                byggeårTekst = 'Ikke registreret';
             }
 
             let boligarealTekst;
@@ -67,11 +67,11 @@ class EjendomsprofilUI {
                 boligarealTekst = 'Ikke registreret';
             }
 
-            let antalVaerelseTekst;
-            if (data.bbr.antalVaerelser) {
-                antalVaerelseTekst = data.bbr.antalVaerelser;
+            let antalVærelseTekst;
+            if (data.bbr.antalVærelser) {
+                antalVærelseTekst = data.bbr.antalVærelser;
             } else {
-                antalVaerelseTekst = 'Ikke registreret';
+                antalVærelseTekst = 'Ikke registreret';
             }
 
             let grundarealTekst;
@@ -82,9 +82,9 @@ class EjendomsprofilUI {
             }
 
             document.getElementById('ejendomstype').textContent = ejendomstypeTekst;
-            document.getElementById('byggeaar').textContent = byggeaarTekst;
+            document.getElementById('byggeaar').textContent = byggeårTekst;
             document.getElementById('boligareal').textContent = boligarealTekst;
-            document.getElementById('antalVaerelser').textContent = antalVaerelseTekst;
+            document.getElementById('antalVaerelser').textContent = antalVærelseTekst;
             document.getElementById('grundareal').textContent = grundarealTekst;
 
             const dato = new Date(data.bbr.senestHentet); /* henter datoen på det tidspunkt vi hentede dataen */
@@ -112,15 +112,7 @@ class EjendomsprofilUI {
         this.modalAnnuller.addEventListener('click', () => {
             this.modalOverlay.classList.remove('aktiv');
         });
-
-        /* luk modalen hvis brugeren klikker på den mørke baggrund */
-        this.modalOverlay.addEventListener('click', (event) => {
-            if (event.target === this.modalOverlay) {
-                this.modalOverlay.classList.remove('aktiv');
-            }
-        });
     }
-
 }
 
 /* instantiér og initialisér når siden indlæses */

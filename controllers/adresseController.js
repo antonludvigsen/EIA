@@ -4,7 +4,7 @@ const eksternAPIService = require('../services/DAWA_API');
 class AdresseController {
 
     /* Vi validerer søgeteksten i sin egen funktion så den kan unit-testes, i stedet for at den isoleres i findAdresse */
-    validerSoegeTekst(søgetekst) {
+    validerSøgeTekst(søgetekst) {
         if (!søgetekst || søgetekst.trim() === '') { /* validering og fejlhåndtering af adressesøgningen */
             return false;
         } else {
@@ -19,7 +19,7 @@ class AdresseController {
         try {
             const søgetekst = req.query.q; /* henter query-parameter q fra URL'en, altså selve søgningen på en adresse */
 
-            if (!adresseController.validerSoegeTekst(søgetekst)) { /* henviser til den øvrige funktion. hvis valideringen er false, sendes en fejl-status ud */
+            if (!adresseController.validerSøgeTekst(søgetekst)) { /* henviser til den øvrige funktion. hvis valideringen er false, sendes en fejl-status ud */
                 return res.status(400).json({ fejl: 'Søgetekst mangler' });
             }
 

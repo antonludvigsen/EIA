@@ -3,18 +3,24 @@
 class BBR_API {
 
     async hentBBRData(adresseId) {
+
         const brugernavn = process.env.BBR_BRUGERNAVN;
         const password = process.env.BBR_PASSWORD;
-
-        const adresseIdKodet = encodeURIComponent(adresseId);
+        const adresseIdKodet = encodeURIComponent(adresseId); /* "encodeURIComponent" er kaldt på forhånd og gemt i "adresseIdKode" */
+        
+        /* BBR-kald:
+        "https://services.datafordeler.dk/BBR/BBRPublic/1/REST/" er det plain kald vi laver - herfra bygger vi ovenpå URL'en som beskrevet nedenfor */
         const bygningURL = `https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=${adresseIdKodet}&username=${brugernavn}&password=${password}&format=JSON`;
-        /* https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning: endpoint-adressen til BBR's bygning-metode. */
-        /* ? markerer starten på query-parametre, altså de filtre vi sender med i kaldet. */
-        /* husnummer=${adresseIdKodet} sender adgangsadresse-ID'et fra DAWA som parameter. encodeURIComponent er kaldt på forhånd og gemt i adresseIdKodet. */
-        /* &username=${brugernavn} sender brugernavnet fra .env. &password=${password} sender passwordet fra .env. Det er derfor vi aldrig hardkoder det direkte i koden, men læser det fra miljøvariablen i stedet. */
-        /* &format=JSON fortæller BBR at vi vil have svaret i JSON-format. Uden den parameter returnerer BBR XML som standard. */
+    
+        /* Resterende opbygning af kaldet:
+        1:      "bygning" endpoint til BBR's bygning-metode.
+        2:      "?" markerer starten på filtre vi sender med i kaldet.
+        3:      "husnummer=${adresseIdKode}" sender adgangsadresse-ID'et fra DAWA som parameter.
+        4:      "&username=${brugernavn}" sender brugernavnet fra .env.
+        5:      "&password=${password}" sender passwordet fra .env.
+        6:      "&format=JSON" fortæller BBR at vi vil have svaret i JSON-format. Uden den parameter returnerer BBR XML som standard. */
 
-        /* BBR returnerer ejendomstype som en numerisk kode (byg021). Vi oversætter koden til et læsbart navn via denne kodeliste. Baseret på BBR's officielle kodeliste for bygningsanvendelse. */
+        /* BBR returnerer ejendomstype som en numerisk kode, vi oversætter til beskrivelse (kilde: https://teknik.bbr.dk/kodelister/0/1/0/BygAnvendelse) */
         const ejendomsTypeKoder = {
             '110': 'Stuehus til landbrugsejendom',
             '120': 'Fritliggende enfamiliehus',
@@ -123,13 +129,13 @@ class BBR_API {
             '999': 'Ukendt bygning'
         };
 
-        const response = await fetch(bygningURL);
+        const svar = await fetch(bygningURL);
 
-        if (!response.ok) {
-            throw new Error(`BBR-API fejl: ${response.status}`);
+        if (!svar.ok) {
+            throw new Error(`BBR-API fejl: ${svar.status}`);
         }
 
-        const data = await response.json();
+        const data = await svar.json();
 
         /* BBR returnerer et array af bygninger, vi tager den første */
         if (!data || data.length === 0) {
@@ -141,7 +147,6 @@ class BBR_API {
 
         /* konverterer BBR's numeriske kode til string så den matcher nøglerne i kodelisten */
         const ejendomsTypeKode = String(bygning.byg021BygningensAnvendelse);
-
         let ejendomstype;
         if (ejendomsTypeKoder[ejendomsTypeKode]) {
             ejendomstype = ejendomsTypeKoder[ejendomsTypeKode]; /* slår koden op i kodelisten. Hvis koden ikke kendes, vises "Ukendt type" efterfulgt af koden */
@@ -149,9 +154,9 @@ class BBR_API {
             ejendomstype = `Ukendt type (${ejendomsTypeKode})`;
         }
 
-        let byggeaar = null;
+        let byggeår = null;
         if (bygning.byg026Opførelsesår) {
-            byggeaar = bygning.byg026Opførelsesår;
+            byggeår = bygning.byg026Opførelsesår;
         }
 
         let boligareal = null;
@@ -165,49 +170,48 @@ class BBR_API {
         }
 
         /* Vi går her ind og henter det specifikke antal af værelser fra BBR */
-        let antalVaerelser = null;
+        let antalVærelser = null;
         try {
             const bygningId = encodeURIComponent(bygning.id_lokalId);
             const enhedURL = `https://services.datafordeler.dk/BBR/BBRPublic/1/REST/enhed?Bygning=${bygningId}&username=${brugernavn}&password=${password}&format=JSON`;
+            const enhedSvar = await fetch(enhedURL);
 
-            const enhedResponse = await fetch(enhedURL);
-
-            if (enhedResponse.ok) {
-                const enhedData = await enhedResponse.json();
+            if (enhedSvar.ok) {
+                const enhedData = await enhedSvar.json();
 
                 if (enhedData && enhedData.length > 0) {
                     const enhed = enhedData[0];
 
-                    antalVaerelser = enhed.enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
+                    antalVærelser = enhed.enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
                 }
             }
         } catch (enhedFejl) {
-            antalVaerelser = null;
+            antalVærelser = null;
         }
 
         const senestHentet = new Date().toISOString(); /* new Date() opretter et JavaScript Date-objekt med det aktuelle tidspunkt og konvertere det (fx 2026-04-29T13:22:00.000Z). Det er det format databasen forventer i DATETIME-kolonnen senestHentet. */
 
         return {
             ejendomstype: ejendomstype,
-            byggeaar: byggeaar,
+            byggeår: byggeår,
             boligareal: boligareal,
-            antalVaerelser: antalVaerelser,
+            antalVærelser: antalVærelser,
             grundareal: grundareal,
             senestHentet: senestHentet
-        }; /* BBR's feltnavne som byg021BygningensAnvendelse og byg026Opførelsesår er interne BBR-koder der er svære at læse og arbejde med i resten af koden. Vi oversætter dem til vores egne navne fra DCD'et, altså ejendomstype, byggeaar osv. Hvis BBR en dag ændrer deres feltnavn, er der kun ét sted at rette det, nemlig her i eksternApiService.js. */
+        }; /* BBR's feltnavne: "byg021BygningensAnvendelse" og "byg026Opførelsesår" er interne BBR-koder der er svære at læse og arbejde med i resten af koden. Vi oversætter dem til vores egne navne fra DCD'et. */
     };
 
     /* --- henter detaljerede adresseoplysninger fra DAWA på baggrund af adresseId. strukturen returnerer adgangsadresseid, som vi videregiver til BBR-kaldet. --- */
     async hentAdresseDetaljer(adresseId) {
         const adresseDetaljerURL = `https://api.dataforsyningen.dk/adresser/${adresseId}?format=json&struktur=mini`;
 
-        const response = await fetch(adresseDetaljerURL);
+        const svar = await fetch(adresseDetaljerURL);
 
-        if (!response.ok) {
-            throw new Error(`DAWA detalje-API fejl: ${response.status}`);
+        if (!svar.ok) {
+            throw new Error(`DAWA detalje-API fejl: ${svar.status}`);
         }
 
-        const data = await response.json();
+        const data = await svar.json();
 
         let etage = null;
         if (data.etage) {
