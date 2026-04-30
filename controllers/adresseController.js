@@ -1,5 +1,5 @@
-/* (..) betyder "gå en mappe ud", vi går fra services ud til roden og ind til controllers */
-const eksternAPIService = require('../services/DAWA_API');
+
+const DAWA_API = require('../services/DAWA_API');
 
 class AdresseController {
 
@@ -12,18 +12,18 @@ class AdresseController {
         }
     };
 
-    async findAdresse(req, res) { /* modtager Express request og response objekter.
+    findAdresse = async (req, res) => { /* arrow functions husker automatisk hvem this er, selv når de gives videre som callbacks til Express. Normale metoder glemmer det.
         req = indkommende HTTP-request (URL, parametre, body).
         res = sende svar tilbage til browseren */
 
         try {
             const søgetekst = req.query.q; /* henter query-parameter q fra URL'en, altså selve søgningen på en adresse */
 
-            if (!adresseController.validerSøgeTekst(søgetekst)) { /* henviser til den øvrige funktion. hvis valideringen er false, sendes en fejl-status ud */
+            if (!this.validerSøgeTekst(søgetekst)) { /* henviser til den øvrige funktion. hvis valideringen er false, sendes en fejl-status ud */
                 return res.status(400).json({ fejl: 'Søgetekst mangler' });
             }
 
-            const adresser = await eksternAPIService.hentAdresse(søgetekst); /* kalder DAWA og venter på svar */
+            const adresser = await DAWA_API.hentAdresse(søgetekst); /* kalder DAWA og venter på svar */
             res.status(200).json(adresser); /* sender tilbage til browseren i JSON med godkendt statuskode */
 
         } catch (fejl) { /* Hvis der er serverfejl skal dette også håndteres */

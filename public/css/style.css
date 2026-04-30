@@ -137,17 +137,17 @@ a {
 }
 
 .hero-titel,
-.hero-soeg-wrapper {
+.hero-søg-wrapper {
   position: relative;
   z-index: 1;
 }
 
-.hero-soeg-wrapper {
+.hero-søg-wrapper {
   width: 100%;
   max-width: 660px;
 }
 
-.hero-soegefelt {
+.hero-søgefelt {
   width: 100%;
   padding: 16px 24px;
   font-size: 1rem;
@@ -158,7 +158,7 @@ a {
   outline: none;
 }
 
-.hero-soegefelt::placeholder {
+.hero-søgefelt::placeholder {
   color: var(--farve-tekst-graa);
 }
 
@@ -369,7 +369,7 @@ a {
   color: var(--farve-tekst-graa);
 }
 
-.ejendom-data-vaerdi {
+.ejendom-data-værdi {
   font-size: 0.9rem;
   color: var(--farve-tekst-moerk);
   font-weight: bold;

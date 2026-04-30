@@ -20,28 +20,21 @@ class EjendomsprofilUI {
     /* henter her ejendomsdata fra vores backend når siden indlæses */
     async hentOgVisEjendomsdata() {
         try {
-            const response = await fetch(`/api/ejendomsprofil/vis?adresseId=${encodeURIComponent(this.adresseId)}`);
-            const data = await response.json();
+            const svar = await fetch(`/api/ejendomsprofil/vis?adresseId=${encodeURIComponent(this.adresseId)}`);
+            const data = await svar.json();
 
             /* vis adresse i overskriften */
-            const vejnavn = data.adresse.vejnavn;
-            const husnummer = data.adresse.husnummer;
-            const etage = data.adresse.etage;
-            const dør = data.adresse.dør;
-            const postnummer = data.adresse.postnummer;
-            const bynavn = data.adresse.bynavn;
+            const vejnavn = data.dawa.vejnavn;
+            const husnummer = data.dawa.husnummer;
+            const etage = data.dawa.etage;
+            const dør = data.dawa.dør;
+            const postnummer = data.dawa.postnummer;
+            const bynavn = data.dawa.bynavn;
 
             /* byg adresseteksten, og tilføj kun etage og dør hvis de findes */
             let adresseTekst = `${vejnavn} ${husnummer}`;
-
-            if (etage) {
-                adresseTekst += `, ${etage}`;
-            }
-
-            if (dør) {
-                adresseTekst += ` ${dør}`;
-            }
-
+            if (etage) { adresseTekst += `, ${etage}`; }
+            if (dør) { adresseTekst += ` ${dør}`; }
             adresseTekst += `, ${postnummer} ${bynavn}`;
             document.getElementById('ejendom-adresse').textContent = adresseTekst;
 
@@ -82,9 +75,9 @@ class EjendomsprofilUI {
             }
 
             document.getElementById('ejendomstype').textContent = ejendomstypeTekst;
-            document.getElementById('byggeaar').textContent = byggeårTekst;
+            document.getElementById('byggeår').textContent = byggeårTekst;
             document.getElementById('boligareal').textContent = boligarealTekst;
-            document.getElementById('antalVaerelser').textContent = antalVærelseTekst;
+            document.getElementById('antalVærelser').textContent = antalVærelseTekst;
             document.getElementById('grundareal').textContent = grundarealTekst;
 
             const dato = new Date(data.bbr.senestHentet); /* henter datoen på det tidspunkt vi hentede dataen */
