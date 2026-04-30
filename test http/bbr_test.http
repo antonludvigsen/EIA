@@ -1,3 +1,3 @@
 # Dette dokument bruges som test for http kald for BBR-apiet
 
-GET h
+GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/Enhed?AdresseIdentificerer=0a3f509d-52ed-32b8-e044-0003ba298018&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSON

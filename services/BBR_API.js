@@ -160,8 +160,8 @@ class BBR_API {
         }
 
         let boligareal = null;
-        if (bygning.byg038SamletBygningsareal) {
-            boligareal = bygning.byg038SamletBygningsareal;
+        if (bygning.enh027ArealTilBeboelse) {
+            boligareal = bygning.enh027ArealTilBeboelse;
         }
 
         let grundareal = null;
