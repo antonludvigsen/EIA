@@ -1,38 +1,128 @@
 /* ejendomsprofil.js håndterer al UI logik for ejendomsprofilsiden. den læser adresseId fra URL'en, kalder /api/ejendomsprofil/vis og indsætter data dynamisk i HTML'en. */
 
-/* læs adresseId fra URL'en */
-const urlParametre = new URLSearchParams(window.location.search); /* er browserens indbyggede måde at læse URL-parametre på */
-const adresseId = urlParametre.get('adresseId');
+class EjendomsprofilUI {
 
-if (!adresseId) { /* hvis der ikke er et adresseId i URL'en, sender vi brugeren tilbage til forsiden */
-    window.location.href = '/index.html';
-}
+    constructor() {
+        /* læs adresseId fra URL'en */
+        const urlParametre = new URLSearchParams(window.location.search); /* er browserens indbyggede måde at læse URL-parametre på */
+        this.adresseId = urlParametre.get('adresseId');
 
-/* henter her ejendomsdata fra vores backend når siden indlæses */
-async function hentOgVisEjendomsdata() {
-    try {
-        const response = await fetch(`/api/ejendomsprofil/vis?adresseId=${encodeURIComponent(adresseId)}`);
-        const data = await response.json();
+        if (!this.adresseId) { /* hvis der ikke er et adresseId i URL'en, sender vi brugeren tilbage til forsiden */
+            window.location.href = '/index.html';
+        }
 
-        /* vis adresse i overskriften */
-        const adresseTekst = `${data.adresse.vejnavn} ${data.adresse.husnummer}, ${data.adresse.postnummer} ${data.adresse.bynavn}`;
-        document.getElementById('ejendom-adresse').textContent = adresseTekst;
-
-        /* vis BBR-data i felterne */
-        document.getElementById('ejendomstype').textContent = data.bbr.ejendomstype || 'Ikke registreret';
-        document.getElementById('byggeaar').textContent = data.bbr.byggeaar || 'Ikke registreret';
-        document.getElementById('boligareal').textContent = data.bbr.boligareal ? `${data.bbr.boligareal} m²` : 'Ikke registreret';
-        document.getElementById('antalVaerelser').textContent = data.bbr.antalVaerelser || 'Ikke registreret';
-        document.getElementById('grundareal').textContent = data.bbr.grundareal ? `${data.bbr.grundareal} m²` : 'Ikke registreret';
-
-        const dato = new Date(data.bbr.senestHentet); /* henter datoen på det tidspunkt vi hentede dataen */
-        document.getElementById('senestHentet').textContent = dato.toLocaleDateString('da-DK'); /* formatere datoen til læsbar dansk format */
-
-    } catch (fejl) {
-        console.error('Fejl ved hentning af ejendomsdata:', fejl);
-        document.getElementById('ejendom-adresse').textContent = 'Kunne ikke hente ejendomsdata';
+        /* Modal-logik */
+        this.modalOverlay = document.getElementById('modal-overlay');
+        this.modalAnnuller = document.getElementById('modal-annuller');
+        this.gemKnap = document.getElementById('gem-ejendomsprofil');
     }
+
+    /* henter her ejendomsdata fra vores backend når siden indlæses */
+    async hentOgVisEjendomsdata() {
+        try {
+            const response = await fetch(`/api/ejendomsprofil/vis?adresseId=${encodeURIComponent(this.adresseId)}`);
+            const data = await response.json();
+
+            /* vis adresse i overskriften */
+            const vejnavn = data.adresse.vejnavn;
+            const husnummer = data.adresse.husnummer;
+            const etage = data.adresse.etage;
+            const dør = data.adresse.dør;
+            const postnummer = data.adresse.postnummer;
+            const bynavn = data.adresse.bynavn;
+
+            /* byg adresseteksten, og tilføj kun etage og dør hvis de findes */
+            let adresseTekst = `${vejnavn} ${husnummer}`;
+
+            if (etage) {
+                adresseTekst += `, ${etage}`;
+            }
+
+            if (dør) {
+                adresseTekst += ` ${dør}`;
+            }
+
+            adresseTekst += `, ${postnummer} ${bynavn}`;
+            document.getElementById('ejendom-adresse').textContent = adresseTekst;
+
+            /* vis BBR-data i felterne */
+            let ejendomstypeTekst;
+            if (data.bbr.ejendomstype) {
+                ejendomstypeTekst = data.bbr.ejendomstype;
+            } else {
+                ejendomstypeTekst = 'Ikke registreret';
+            }
+
+            let byggeaarTekst;
+            if (data.bbr.byggeaar) {
+                byggeaarTekst = data.bbr.byggeaar;
+            } else {
+                byggeaarTekst = 'Ikke registreret';
+            }
+
+            let boligarealTekst;
+            if (data.bbr.boligareal) {
+                boligarealTekst = `${data.bbr.boligareal} m²`;
+            } else {
+                boligarealTekst = 'Ikke registreret';
+            }
+
+            let antalVaerelseTekst;
+            if (data.bbr.antalVaerelser) {
+                antalVaerelseTekst = data.bbr.antalVaerelser;
+            } else {
+                antalVaerelseTekst = 'Ikke registreret';
+            }
+
+            let grundarealTekst;
+            if (data.bbr.grundareal) {
+                grundarealTekst = `${data.bbr.grundareal} m²`;
+            } else {
+                grundarealTekst = 'Ikke registreret';
+            }
+
+            document.getElementById('ejendomstype').textContent = ejendomstypeTekst;
+            document.getElementById('byggeaar').textContent = byggeaarTekst;
+            document.getElementById('boligareal').textContent = boligarealTekst;
+            document.getElementById('antalVaerelser').textContent = antalVaerelseTekst;
+            document.getElementById('grundareal').textContent = grundarealTekst;
+
+            const dato = new Date(data.bbr.senestHentet); /* henter datoen på det tidspunkt vi hentede dataen */
+            document.getElementById('senestHentet').textContent = dato.toLocaleDateString('da-DK'); /* formatere datoen til læsbar dansk format */
+
+        } catch (fejl) {
+            console.error('Fejl ved hentning af ejendomsdata:', fejl);
+            document.getElementById('ejendom-adresse').textContent = 'Kunne ikke hente ejendomsdata';
+        }
+    }
+
+    initialiser() {
+        /* og vi kalder selvfølgelig funktionen med det samme når siden indlæses */
+        this.hentOgVisEjendomsdata();
+
+        /* åbn modalen når brugeren trykker gem-knappen */
+        this.gemKnap.addEventListener('click', () => {
+            /* forududfyld navn med adressen */
+            const adresseTekst = document.getElementById('ejendom-adresse').textContent;
+            document.getElementById('profil-navn').value = adresseTekst;
+            this.modalOverlay.classList.add('aktiv');
+        });
+
+        /* luk modalen når brugeren trykker annuller */
+        this.modalAnnuller.addEventListener('click', () => {
+            this.modalOverlay.classList.remove('aktiv');
+        });
+
+        /* luk modalen hvis brugeren klikker på den mørke baggrund */
+        this.modalOverlay.addEventListener('click', (event) => {
+            if (event.target === this.modalOverlay) {
+                this.modalOverlay.classList.remove('aktiv');
+            }
+        });
+    }
+
 }
 
-/* og vi kalder selvfølgelig funktionen med det samme når siden indlæses */
-hentOgVisEjendomsdata();
+/* instantiér og initialisér når siden indlæses */
+const ejendomsprofilUI = new EjendomsprofilUI();
+ejendomsprofilUI.initialiser();

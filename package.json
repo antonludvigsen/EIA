@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dawa-autocomplete2": "^1.1.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mssql": "^12.5.0"

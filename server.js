@@ -10,6 +10,7 @@ const PORT = 3000; /* vi sætter porten til at være 3000, så når vi skal host
 
 app.use(express.json()); /*  */
 app.use(express.static(path.join(__dirname, 'public'))); /* vi sætter den statiske visning til de ting der ligger i public-mappen */
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'))); /* gør node_modules tilgængeligt som en statisk mappe i Express. */
 
 /* routerens interne /søg bliver tilgængelig på /api/adresse/søg. 
 Præfikset /api/ er konvention for at adskille API-endpoints fra HTML-sider. */

@@ -97,7 +97,7 @@ a {
 }
 
 /* ----------------------------------------------------------------- */
-/* hero elementet: "Velkommen til EIA og adressesøgningen findes her */
+/* hero elementet: "Velkommen til EIA" og adressesøgningen findes her */
 .hero {
   position: relative;
   min-height: 80vh;
@@ -106,7 +106,7 @@ a {
   align-items: center;
   justify-content: center;
   padding-top: 60px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .hero-baggrund {
@@ -126,13 +126,6 @@ a {
   z-index: 0;
 }
 
-.hero-titel,
-.hero-soegefelt,
-.soege-resultater {
-  position: relative;
-  z-index: 1;
-}
-
 .hero-titel {
   font-family: var(--skrift-serif);
   font-size: 3.5rem;
@@ -143,23 +136,23 @@ a {
   line-height: 1.2;
 }
 
+.hero-titel,
 .hero-soeg-wrapper {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  max-width: 660px;
   position: relative;
   z-index: 1;
 }
 
+.hero-soeg-wrapper {
+  width: 100%;
+  max-width: 660px;
+}
+
 .hero-soegefelt {
-  flex: 1;
-  max-width: none;
+  width: 100%;
   padding: 16px 24px;
   font-size: 1rem;
   font-family: var(--skrift-serif);
   border: none;
-  border-radius: 8px;
   background-color: var(--farve-lys-graa);
   color: var(--farve-tekst-moerk);
   outline: none;
@@ -169,43 +162,50 @@ a {
   color: var(--farve-tekst-graa);
 }
 
-.hero-soeg-knap {
-  background-color: var(--farve-accent);
-  color: var(--farve-hvid);
-  font-family: var(--skrift-serif);
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
-  border: none;
-  border-radius: 8px;
-  padding: 0 28px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
+/* ----------------------------------------------------------------- */
+/* DAWA Autocomplete2 komponenten styler dropdown-listen der vises under søgefeltet */
 
-.hero-soeg-knap:hover {
-  background-color: var(--farve-accent-hover);
-}
-
-.soege-resultater { /* er stadig tom i HTML, men CSS'en er klar til at JavaScript dynamisk tilføjer resultater som <li>-elementer. */
+.autocomplete-container {
+  position: relative; /* relativ positionering så dropdown placeres korrekt under inputfeltet */
   width: 100%;
-  max-width: 600px;
-  list-style: none;
-  background-color: var(--farve-hvid);
-  margin-top: 2px;
-  max-height: 300px; /* maksimal højde */
-  overflow-y: auto; /* scroll inden for listen hvis den overstiger max-height */
 }
 
-.soege-resultater li {
-  padding: 12px 24px;
+.autocomplete-container input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.autocomplete-container input::placeholder {
+  color: var(--farve-tekst-graa);
+}
+
+.dawa-autocomplete-suggestions {
+  margin: 0;
+  padding: 0;
+  background: var(--farve-hvid);
+  position: absolute;
+  top: 100%; /* starter præcist under inputfeltet */
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow-y: auto;
+  max-height: 250px;
+  box-sizing: border-box;
+}
+
+.dawa-autocomplete-suggestions .dawa-autocomplete-suggestion {
+  list-style: none;
   cursor: pointer;
+  padding: 12px 24px;
   font-size: 0.95rem;
+  font-family: var(--skrift-serif);
   color: var(--farve-tekst-moerk);
   border-bottom: 1px solid var(--farve-lys-graa);
 }
 
-.soege-resultater li:hover {
-  background-color: var(--farve-lys-graa);
+.dawa-autocomplete-suggestions .dawa-autocomplete-suggestion:hover,
+.dawa-autocomplete-suggestions .dawa-autocomplete-suggestion.dawa-selected {
+  background: var(--farve-lys-graa);
 }
 
 /* ----------------------------------------------------------------- */
@@ -304,7 +304,6 @@ a {
 
 .footer-streg {
   border-top: 1px solid #333333;
-  padding: 20px ;
   padding: 20px 100px 20px 100px;
 }
 
@@ -394,5 +393,110 @@ a {
 }
 
 .ejendom-gem-knap:hover {
+  background-color: var(--farve-accent-hover);
+}
+
+/* ----------------------------------------------------------------- */
+/* Modal (udfyldningsboks der popper op oven på ejendomsprofilen når man trykker gem) */
+
+.modal-overlay {
+  display: none; /* skjult som standard, vises via JavaScript */
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.aktiv {
+  display: flex; /* vises når JavaScript tilføjer klassen aktiv */
+}
+
+.modal {
+  background-color: var(--farve-hvid);
+  padding: 48px;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modal-titel {
+  font-family: var(--skrift-serif);
+  font-size: 1.5rem;
+  font-weight: normal;
+  color: var(--farve-tekst-moerk);
+}
+
+.modal-beskrivelse {
+  font-size: 0.9rem;
+  color: var(--farve-tekst-graa);
+}
+
+.modal-felt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-label {
+  font-size: 0.85rem;
+  color: var(--farve-tekst-graa);
+  letter-spacing: 0.05em;
+}
+
+.modal-input,
+.modal-textarea {
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: var(--skrift-serif);
+  border: 1px solid #dddddd;
+  background-color: var(--farve-lys-graa);
+  color: var(--farve-tekst-moerk);
+  outline: none;
+  resize: none;
+}
+
+.modal-input:focus,
+.modal-textarea:focus {
+  border-color: var(--farve-accent);
+}
+
+.modal-knapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.modal-annuller-knap {
+  background-color: transparent;
+  color: var(--farve-tekst-graa);
+  font-family: var(--skrift-serif);
+  font-size: 0.9rem;
+  border: 1px solid #dddddd;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.modal-annuller-knap:hover {
+  border-color: var(--farve-tekst-moerk);
+  color: var(--farve-tekst-moerk);
+}
+
+.modal-gem-knap {
+  background-color: var(--farve-accent);
+  color: var(--farve-hvid);
+  font-family: var(--skrift-serif);
+  font-size: 0.9rem;
+  border: none;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-gem-knap:hover {
   background-color: var(--farve-accent-hover);
 }

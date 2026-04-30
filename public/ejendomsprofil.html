@@ -1,6 +1,3 @@
-<!-- Ejendomsprofilsiden bruger præcis samme layout som forsiden, blot uden en hero og body, da vi ikke har brug for dette til indholdet af data vi vil vise. -->
-
-
 <!DOCTYPE html>
 <html lang="da">
 <head>
@@ -10,6 +7,7 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+  <!-- Ejendomsprofilsiden bruger præcis samme layout som forsiden, blot uden en hero og body, da vi ikke har brug for dette til indholdet af data vi vil vise. -->
 
   <!-- NAVBAR -->
   <nav class="navbar">
@@ -48,7 +46,7 @@
             <span class="ejendom-data-vaerdi" id="byggeaar">-</span>
           </div>
           <div class="ejendom-data-felt">
-            <span class="ejendom-data-label">Boligareal</span>
+            <span class="ejendom-data-label">Boligareal (samlet bygning)</span>
             <span class="ejendom-data-vaerdi" id="boligareal">-</span>
           </div>
           <div class="ejendom-data-felt">
@@ -56,7 +54,7 @@
             <span class="ejendom-data-vaerdi" id="antalVaerelser">-</span>
           </div>
           <div class="ejendom-data-felt">
-            <span class="ejendom-data-label">Grundareal</span>
+            <span class="ejendom-data-label">Grundareal (samlet grund)</span>
             <span class="ejendom-data-vaerdi" id="grundareal">-</span>
           </div>
           <div class="ejendom-data-felt">
@@ -76,6 +74,39 @@
     </div>
 
   </section>
+
+  <!-- MODAL: vi tilføjer et modal som popper op når man trykker på gem knappen. Dette skal sikre, at man kan indsætte metadata (navn og beskrivelse) for den gemte ejendomsprofil -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h2 class="modal-titel">Gem ejendomsprofil</h2>
+      <p class="modal-beskrivelse">Giv ejendomsprofilen et navn og en valgfri beskrivelse.</p>
+
+      <div class="modal-felt">
+        <label class="modal-label" for="profil-navn">Navn</label>
+        <input
+          type="text"
+          id="profil-navn"
+          class="modal-input"
+          placeholder="Indtast navn..."
+        >
+      </div>
+
+      <div class="modal-felt">
+        <label class="modal-label" for="profil-beskrivelse">Beskrivelse (valgfrit)</label>
+        <textarea
+          id="profil-beskrivelse"
+          class="modal-textarea"
+          placeholder="fx potentiel ejendomsprofil til investeringscase..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="modal-knapper">
+        <button class="modal-annuller-knap" id="modal-annuller">Annuller</button>
+        <button class="modal-gem-knap" id="modal-gem">Gem</button>
+      </div>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <footer class="footer">
