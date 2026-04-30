@@ -6,7 +6,7 @@ const adresseRoute = require('./routes/adresse'); /* importere adresse routeren 
 const ejendomsprofilRoute = require('./routes/ejendomsprofil');
 
 const app = express(); /* opretter selve Express-applikationen. app er objektet vi hænger alle routes og middleware på. */
-const PORT = 3000; /* vi sætter porten til at være 3000, så når vi skal hoste kommer det på http://localhost:3000 */
+const PORT = 2026; /* vi sætter porten til at være 2026, så når vi skal hoste kommer det på http://localhost:2026 */
 
 app.use(express.json()); /*  */
 app.use(express.static(path.join(__dirname, 'public'))); /* vi sætter den statiske visning til de ting der ligger i public-mappen */

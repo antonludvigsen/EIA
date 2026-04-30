@@ -9,13 +9,13 @@ class DAWA_API {
         const søgningKodet = encodeURIComponent(søgning); /* encodeURIComponent() bruges fordi brugerens søgning kan indeholde mellemrum, æ, ø, å eller andre tegn der skal kodes korrekt for at virke i en URL. */
         const autocompleteURL = `https://api.dataforsyningen.dk/autocomplete?q=${søgningKodet}&type=adresse`; /* bygger URL'en til DAWA's autocomplete-endpoint.*/
 
-        const response = await fetch(autocompleteURL); /* sender HTTP-requesten til DAWA og venter på svar. */
+        const svar = await fetch(autocompleteURL); /* sender HTTP-requesten til DAWA og venter på svar. */
 
-        if (!response.ok) { /* hvis svaret vi fetcher fra DAWA ikke er ok, sender vi en fejl tilbage */
-            throw new Error(`DAWA-API fejl: ${response.status}`);
+        if (!svar.ok) { /* hvis svaret vi fetcher fra DAWA ikke er ok, sender vi en fejl tilbage */
+            throw new Error(`DAWA-API fejl: ${svar.status}`);
         }
 
-        const data = await response.json(); /* parser svaret fra DAWA som JSON */
+        const data = await svar.json(); /* parser svaret fra DAWA som JSON */
         return data; /* og returnerer det */
     };
 
