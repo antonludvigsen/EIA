@@ -540,3 +540,108 @@ a {
 .modal-gem-knap:hover {
   background-color: var(--farve-accent-hover);
 }
+
+/* ----------------------------------------------------------------- */
+/* Styling til portefølje.html */
+
+.portefølje-sektion {
+      min-height: 100vh;
+      background-color: var(--farve-moerk-groen);
+      padding: 120px 80px 80px 80px;
+    }
+
+    .portefølje-header {
+      margin-bottom: 48px;
+    }
+
+    .portefølje-titel {
+      font-family: var(--skrift-serif);
+      font-size: 2.5rem;
+      font-weight: normal;
+      color: var(--farve-hvid);
+      margin-bottom: 12px;
+    }
+
+    .portefølje-undertitel {
+      font-size: 0.95rem;
+      color: var(--farve-tekst-graa);
+    }
+
+    .portefølje-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .portefølje-kort {
+      background-color: var(--farve-hvid);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: box-shadow 0.2s;
+    }
+
+    .portefølje-kort:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .portefølje-kort-navn {
+      font-family: var(--skrift-serif);
+      font-size: 1.2rem;
+      font-weight: normal;
+      color: var(--farve-tekst-moerk);
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--farve-accent);
+    }
+
+    .portefølje-kort-adresse {
+      font-size: 0.9rem;
+      color: var(--farve-tekst-moerk);
+    }
+
+    .portefølje-kort-beskrivelse {
+      font-size: 0.875rem;
+      color: var(--farve-tekst-graa);
+      flex: 1;
+    }
+
+    .portefølje-kort-dato {
+      font-size: 0.8rem;
+      color: var(--farve-tekst-graa);
+      letter-spacing: 0.04em;
+    }
+
+    .portefølje-tom {
+      color: var(--farve-tekst-graa);
+      font-size: 1rem;
+    }
+
+/* ----------------------------------------------------------------- */
+/* Styling til bruger.html */
+
+.bruger-sektion {
+  min-height: 100vh;
+  background-color: var(--farve-moerk-groen);
+  padding: 120px 80px 80px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bruger-kort {
+  background-color: var(--farve-hvid);
+  padding: 48px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.bruger-kort-titel {
+  font-family: var(--skrift-serif);
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: var(--farve-tekst-moerk);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--farve-accent);
+}

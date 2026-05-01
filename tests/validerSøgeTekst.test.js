@@ -16,6 +16,6 @@ test('afviser streng med kun mellemrum', () => {
 
 /* test 3: skal godkende hvis søgeteksten er gyldig */
 test('godkender gyldig søgetekst', () => {
-    expect(validerSøgeTekst('Grønnegade')).toBe(true);
+    expect(validerSøgeTekst('Birkegade')).toBe(true);
 });
 

@@ -83,6 +83,10 @@ class EjendomsprofilUI {
             const dato = new Date(data.bbr.senestHentet); /* henter datoen på det tidspunkt vi hentede dataen */
             document.getElementById('senestHentet').textContent = dato.toLocaleDateString('da-DK'); /* formatere datoen til læsbar dansk format */
 
+            /* gem data på instansen så gemEjendomsprofil() kan bruge det */
+            this.dawaData = data.dawa;
+            this.bbrData = data.bbr;
+
             /* vis luftfoto og matrikelkort af ejendommen */
             document.getElementById('luftfoto').src = data.kort.luftfotoURL;
             document.getElementById('matrikel').src = data.kort.matrikelURL;
@@ -90,6 +94,35 @@ class EjendomsprofilUI {
         } catch (fejl) {
             console.error('Fejl ved hentning af ejendomsdata:', fejl);
             document.getElementById('ejendom-adresse').textContent = 'Kunne ikke hente ejendomsdata';
+        }
+    }
+
+    async gemEjendomsprofil() {
+        try {
+            const navn = document.getElementById('profil-navn').value;
+            const beskrivelse = document.getElementById('profil-beskrivelse').value;
+
+            const svar = await fetch('/api/ejendomsprofil/gem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    navn,
+                    beskrivelse,
+                    adresse: this.dawaData,
+                    ejendomsdata: this.bbrData
+                })
+            });
+
+            if (!svar.ok) {
+                throw new Error(`Server svarede med status ${svar.status}`);
+            }
+
+            this.modalOverlay.classList.remove('aktiv');
+            alert("Denne ejendomsprofil er nu gemt i 'Min Portefølje'");
+            window.location.href = '/index.html';
+
+        } catch (fejl) {
+            console.error('Fejl ved gemning af ejendomsprofil:', fejl);
         }
     }
 
@@ -108,6 +141,11 @@ class EjendomsprofilUI {
         /* luk modalen når brugeren trykker annuller */
         this.modalAnnuller.addEventListener('click', () => {
             this.modalOverlay.classList.remove('aktiv');
+        });
+
+        /* gem ejendomsprofilen når brugeren trykker gem i modalen */
+        document.getElementById('modal-gem').addEventListener('click', () => {
+            this.gemEjendomsprofil();
         });
     }
 }

@@ -2,6 +2,7 @@
 const DAWA_API = require('../services/DAWA_API')
 const BBR_API = require('../services/BBR_API');
 const KORT_API = require('../services/KORT_API');
+const ejendomsprofilRepositorium = require('../repositories/ejendomsprofilRepositorium');
 
 class EjendomsprofilController {
 
@@ -33,6 +34,30 @@ class EjendomsprofilController {
         } catch (fejl) {
             console.error('Fejl i visEjendomsprofil:', fejl);
             res.status(500).json({ fejl: 'Kunne ikke hente ejendomsdata' });
+        }
+    }
+
+    visPortefølje = async (req, res) => {
+        try {
+            const profiler = await ejendomsprofilRepositorium.hentAlleEjendomsprofiler();
+            res.status(200).json(profiler);
+        } catch (fejl) {
+            console.error('Fejl i visPortefølje:', fejl);
+            res.status(500).json({ fejl: 'Kunne ikke hente portefølje' });
+        }
+    }
+
+    gemEjendomsprofil = async (req, res) => {
+        try {
+            const { navn, beskrivelse, adresse, ejendomsdata } = req.body;
+
+            await ejendomsprofilRepositorium.gemEjendomsprofil(navn, beskrivelse, adresse, ejendomsdata);
+
+            res.status(200).json({ success: true });
+
+        } catch (fejl) {
+            console.error('Fejl i gemEjendomsprofil:', fejl);
+            res.status(500).json({ fejl: 'Kunne ikke gemme ejendomsprofil' });
         }
     }
 

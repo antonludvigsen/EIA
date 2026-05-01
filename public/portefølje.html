@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EIA - Forside</title>
+  <title>EIA - Min Portefølje</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 
@@ -26,31 +26,23 @@
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <img src="/billedemateriale/roed_bygning.jpg" alt="Hero baggrund" class="hero-baggrund">
-    <h1 class="hero-titel">Velkommen til EIA</h1>
-    <div class="hero-søg-wrapper">
-      <input type="text" class="hero-søgefelt" placeholder="Søg efter adresse..." id="adresse-søgefelt">
-      <!-- bruger søgefelts id'et i adresse.js til at forbinde med DAWA Autocomplete2 komponenten -->
+  <!-- PORTEFØLJE INDHOLD -->
+  <section class="portefølje-sektion">
+    <div class="portefølje-header">
+      <h1 class="portefølje-titel">Min Portefølje</h1>
+      <p class="portefølje-undertitel" id="portefølje-antal">Indlæser...</p>
     </div>
-  </section>
-
-  <!-- INDHOLD -->
-  <section class="indhold">
-    <h2 class="indhold-titel">Sådan virker det</h2>
     <hr class="indhold-divider">
+    <div class="portefølje-grid" id="portefølje-grid"></div>
   </section>
 
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-indhold">
-
       <div class="footer-logo-sektion">
         <img src="/billedemateriale/eia_hvidt_logo.png" alt="EIA Logo" class="footer-logo">
         <p class="footer-copyright">© 2026 EIA. Alle rettigheder forbeholdes.</p>
       </div>
-
       <div class="footer-kolonne">
         <h4 class="footer-overskrift">KONTAKT</h4>
         <ul class="footer-liste">
@@ -59,14 +51,13 @@
           <li>Solbjerg Plads 3, 2000 Frederiksberg</li>
         </ul>
       </div>
-
       <div class="footer-kolonne">
         <h4 class="footer-overskrift">NAVIGATION</h4>
         <ul class="footer-liste">
           <li><a href="/index.html">Forside</a></li>
+          <li><a href="/portefølje.html">Min Portefølje</a></li>
         </ul>
       </div>
-
       <div class="footer-kolonne">
         <h4 class="footer-overskrift">SOCIALE MEDIER</h4>
         <ul class="footer-liste">
@@ -75,17 +66,12 @@
           <li><a href="#">Twitter / X</a></li>
         </ul>
       </div>
-
     </div>
     <div class="footer-streg"></div>
   </footer>
 
-  <!-- script tags for DAWA-API'et -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></script>
-  <script src="/node_modules/dawa-autocomplete2/dist/js/dawa-autocomplete2.min.js"></script>
+  <script src="/js/portefølje.js"></script>
 
-  <script src="/js/adresse.js"></script>
 </body>
 
 </html>

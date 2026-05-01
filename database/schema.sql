@@ -12,7 +12,7 @@ CREATE TABLE Bruger (
     oprettetDato    DATETIME DEFAULT GETDATE() /* opretter automatisk tidspunkt */
 );
 
-INSERT INTO Bruger (navn) VALUES ('EIA Bruger');
+INSERT INTO Bruger (navn, oprettetDato) VALUES ('EIA Bruger', '2026-04-02');
 
 /* Adresse */
 CREATE TABLE Adresse (
