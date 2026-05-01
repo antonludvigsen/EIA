@@ -159,21 +159,16 @@ class BBR_API {
             byggeår = bygning.byg026Opførelsesår;
         }
 
-
-        // Vi tjekker om feltet findes og ikke er 0 eller null
         let boligareal = null;
-        if (bygning.byg040BygningensSamledeErhvervsAreal) { /* for lejligheder */
+        if (bygning.byg040BygningensSamledeErhvervsAreal) { /* bedste kald vi kunne finde der reflekterede lejligheder */
             boligareal = bygning.byg040BygningensSamledeErhvervsAreal;
-        } else if (bygning.byg038SamletBygningsareal) { /* for huse */
+        } else if (bygning.byg038SamletBygningsareal) { /* og her det bedste kald for huse */
             boligareal = bygning.byg038SamletBygningsareal;
         }
 
-        let grundareal = null;
-        if (bygning.byg039BygningensSamledeBoligAreal) {
-            grundareal = bygning.byg039BygningensSamledeBoligAreal;
-        }
+        let grundareal = bygning.byg039BygningensSamledeBoligAreal || null; /* igen, bedste bud på hvad det kunne være når man ser på de værdier vi får af test kald */
 
-        /* Vi går her ind og henter det specifikke antal af værelser fra BBR */
+        /* Vi går her ind og henter det specifikke antal af værelser fra BBR i /enhed */
         let antalVærelser = null;
         try {
             const bygningId = encodeURIComponent(bygning.id_lokalId);
@@ -182,10 +177,8 @@ class BBR_API {
 
             if (enhedSvar.ok) {
                 const enhedData = await enhedSvar.json();
-
                 if (enhedData && enhedData.length > 0) {
                     const enhed = enhedData[0];
-
                     antalVærelser = enhed.enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
                 }
             }

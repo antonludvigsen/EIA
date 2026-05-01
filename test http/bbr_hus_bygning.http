@@ -1,0 +1,131 @@
+
+## Ordrup Jagtvej 21, 2920 Charlottenlund
+
+## Tager "adgangsadresseid": "0a3f507b-f767-32b8-e044-0003ba298018" fra DAWA.
+## Sætter husnummer="adresseadgangsid" og kalder med /bygning
+
+GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=0a3f507b-f767-32b8-e044-0003ba298018&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
+
+
+
+## Output:
+
+HTTP/1.1 200 OK
+Cache-Control: private
+Transfer-Encoding: chunked
+Content-Type: application/json; charset=UTF-8
+Server: datafordeler.dk
+SwitchboardPerformanceInMs: 54.0823
+Access-Control-Allow-Origin: *
+X-POWERED-BY: datafordeler.dk
+Date: Fri, 01 May 2026 15:52:34 GMT
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+[
+  {
+    "datafordelerOpdateringstid": "2025-11-11T09:37:20.497226+01:00",
+    "byg007Bygningsnummer": 1,
+    "byg021BygningensAnvendelse": "120",
+    "byg026Opførelsesår": 1936,
+    "byg032YdervæggensMateriale": "1",
+    "byg033Tagdækningsmateriale": "2",
+    "byg037KildeTilBygningensMaterialer": "1",
+    "byg038SamletBygningsareal": 107,
+    "byg039BygningensSamledeBoligAreal": 113,
+    "byg041BebyggetAreal": 107,
+    "byg053BygningsarealerKilde": "1",
+    "byg054AntalEtager": 1,
+    "byg056Varmeinstallation": "2",
+    "byg057Opvarmningsmiddel": "1",
+    "byg058SupplerendeVarme": "1",
+    "byg094Revisionsdato": "2017-08-19T03:54:31.660925+02:00",
+    "byg133KildeTilKoordinatsæt": "K",
+    "byg134KvalitetAfKoordinatsæt": "1",
+    "byg135SupplerendeOplysningOmKoordinatsæt": "11",
+    "byg136PlaceringPåSøterritorie": "0",
+    "byg404Koordinat": "POINT(725005.92 6185852.45)",
+    "byg406Koordinatsystem": "5",
+    "forretningshændelse": "Bygning",
+    "forretningsområde": "54.15.05.05",
+    "forretningsproces": "8",
+    "grund": "2c687ced-9a88-4399-a4db-d4597203b222",
+    "husnummer": "0a3f507b-f767-32b8-e044-0003ba298018",
+    "id_lokalId": "a7f0d0aa-d74c-4750-809a-02a781624dc1",
+    "id_namespace": "http://data.gov.dk/bbr/bygning",
+    "jordstykke": "340621",
+    "kommunekode": "0157",
+    "registreringFra": "2025-11-11T09:37:00.743851+01:00",
+    "registreringsaktør": "BBR",
+    "status": "6",
+    "virkningFra": "2025-11-11T09:37:00.743851+01:00",
+    "virkningsaktør": "Registerfører",
+    "etageList": [
+      {
+        "id_lokalId": "d9166988-4cf0-4767-85a4-4ec0daf82a50",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:04:41.503845+02:00",
+          "bygning": "a7f0d0aa-d74c-4750-809a-02a781624dc1",
+          "eta006BygningensEtagebetegnelse": "st",
+          "eta025Etagetype": "0",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "d9166988-4cf0-4767-85a4-4ec0daf82a50",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0157",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:43:47.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      },
+      {
+        "id_lokalId": "b0045e4f-616c-48af-943d-2429f97ef59a",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:50:20.720319+02:00",
+          "bygning": "a7f0d0aa-d74c-4750-809a-02a781624dc1",
+          "eta006BygningensEtagebetegnelse": "kl",
+          "eta020SamletArealAfEtage": 85,
+          "eta022Kælderareal": 85,
+          "eta025Etagetype": "2",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "b0045e4f-616c-48af-943d-2429f97ef59a",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0157",
+          "registreringFra": "2020-06-12T18:24:45.000022+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2020-06-12T18:24:45.000022+02:00",
+          "virkningsaktør": "BBR21"
+        }
+      }
+    ],
+    "opgangList": [
+      {
+        "id_lokalId": "93071513-c0ef-4ab0-8023-a0dabd7b8282",
+        "opgang": {
+          "datafordelerOpdateringstid": "2021-04-04T02:30:26.602266+02:00",
+          "adgangFraHusnummer": "0a3f507b-f767-32b8-e044-0003ba298018",
+          "bygning": "a7f0d0aa-d74c-4750-809a-02a781624dc1",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "93071513-c0ef-4ab0-8023-a0dabd7b8282",
+          "id_namespace": "http://data.gov.dk/bbr/opgang",
+          "kommunekode": "0157",
+          "opg020Elevator": "0",
+          "registreringFra": "2018-09-14T18:33:47.993333+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2018-09-14T18:33:47.993333+02:00",
+          "virkningsaktør": "BBR"
+        }
+      }
+    ]
+  }
+]

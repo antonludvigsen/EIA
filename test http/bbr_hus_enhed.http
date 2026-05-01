@@ -1,0 +1,61 @@
+
+## Ordrup Jagtvej 21, 2920 Charlottenlund
+
+## Tager "id_loakId" fra /bygning BBR kaldet: "0a3f507b-f767-32b8-e044-0003ba298018" fra DAWA.
+## Sætter husnummer="adresseadgangsid" og kalder med /bygning
+
+## /enhed
+## Bygning="id_lokalId"
+
+GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/enhed?bygning=a7f0d0aa-d74c-4750-809a-02a781624dc1&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
+
+## Output:
+
+HTTP/1.1 200 OK
+Cache-Control: private
+Transfer-Encoding: chunked
+Content-Type: application/json; charset=UTF-8
+Server: datafordeler.dk
+SwitchboardPerformanceInMs: 46.0006
+Access-Control-Allow-Origin: *
+X-POWERED-BY: datafordeler.dk
+Date: Fri, 01 May 2026 15:57:08 GMT
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+[
+  {
+    "datafordelerOpdateringstid": "2022-04-25T09:07:47.600900+02:00",
+    "adresseIdentificerer": "0a3f50a3-eb37-32b8-e044-0003ba298018",
+    "enh020EnhedensAnvendelse": "120",
+    "enh023Boligtype": "1",
+    "enh024KondemneretBoligenhed": "0",
+    "enh026EnhedensSamledeAreal": 113,
+    "enh027ArealTilBeboelse": 113,
+    "enh030KildeTilEnhedensArealer": "1",
+    "enh031AntalVærelser": 4, 
+    "enh032Toiletforhold": "T",
+    "enh033Badeforhold": "V",
+    "enh034Køkkenforhold": "E",
+    "enh045Udlejningsforhold": "2",
+    "enh048GodkendtTomBolig": "0",
+    "enh065AntalVandskylledeToiletter": 2,
+    "enh066AntalBadeværelser": 2,
+    "enh071AdresseFunktion": "0",
+    "etage": "d9166988-4cf0-4767-85a4-4ec0daf82a50",
+    "forretningshændelse": "Enhed",
+    "forretningsområde": "54.15.05.05",
+    "forretningsproces": "8",
+    "id_lokalId": "238eafc8-be8b-420c-853d-7b6eead04f52",
+    "id_namespace": "http://data.gov.dk/bbr/enhed",
+    "kommunekode": "0157",
+    "opgang": "93071513-c0ef-4ab0-8023-a0dabd7b8282",
+    "registreringFra": "2022-04-25T09:06:30.894723+02:00",
+    "registreringsaktør": "BBR",
+    "status": "6",
+    "virkningFra": "2022-04-25T09:06:30.894723+02:00",
+    "virkningsaktør": "Registerfører",
+    "bygning": "a7f0d0aa-d74c-4750-809a-02a781624dc1"
+  }
+]
