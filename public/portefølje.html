@@ -28,12 +28,28 @@
 
   <!-- PORTEFØLJE INDHOLD -->
   <section class="portefølje-sektion">
+
+    <!-- Sektion 1: Sideoverskrift -->
     <div class="portefølje-header">
       <h1 class="portefølje-titel">Min Portefølje</h1>
-      <p class="portefølje-undertitel" id="portefølje-antal">Indlæser...</p>
+      <p class="portefølje-brodtekst">På denne side kan du se hele overblikket over dine gemte ejendomsprofiler og dine oprettede investeringscases</p>
+      <hr class="portefølje-divider">
     </div>
-    <hr class="indhold-divider">
-    <div class="portefølje-grid" id="portefølje-grid"></div>
+
+    <!-- Sektion 2: Gemte Ejendomsprofiler -->
+    <div class="portefølje-sub-sektion">
+      <h2 class="portefølje-underoverskrift">Gemte Ejendomsprofiler</h2>
+      <hr class="portefølje-divider">
+      <div class="portefølje-grid" id="portefølje-grid"></div>
+    </div>
+
+    <!-- Sektion 3: Mine Investeringscases -->
+    <div class="portefølje-sub-sektion">
+      <h2 class="portefølje-underoverskrift">Mine Investeringscases</h2>
+      <hr class="portefølje-divider">
+      <div class="portefølje-grid"></div>
+    </div>
+
   </section>
 
   <!-- FOOTER -->
@@ -69,6 +85,26 @@
     </div>
     <div class="footer-streg"></div>
   </footer>
+
+  <!-- OPDATER MODAL -->
+  <div class="modal-overlay" id="opdater-modal-overlay">
+    <div class="modal">
+      <h2 class="modal-titel">Opdater ejendomsprofil</h2>
+      <p class="modal-beskrivelse">Rediger navn og beskrivelse for ejendomsprofilen.</p>
+      <div class="modal-felt">
+        <label class="modal-label" for="opdater-navn">Navn</label>
+        <input type="text" id="opdater-navn" class="modal-input" placeholder="Indtast navn...">
+      </div>
+      <div class="modal-felt">
+        <label class="modal-label" for="opdater-beskrivelse">Beskrivelse (valgfrit)</label>
+        <textarea id="opdater-beskrivelse" class="modal-textarea" rows="4" placeholder="Tilføj en beskrivelse..."></textarea>
+      </div>
+      <div class="modal-knapper">
+        <button class="modal-annuller-knap" id="opdater-modal-annuller">Annuller</button>
+        <button class="modal-gem-knap" id="opdater-modal-gem">Gem ændringer</button>
+      </div>
+    </div>
+  </div>
 
   <script src="/js/portefølje.js"></script>
 

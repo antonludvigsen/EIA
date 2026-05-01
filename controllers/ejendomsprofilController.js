@@ -47,6 +47,17 @@ class EjendomsprofilController {
         }
     }
 
+    opdaterEjendomsprofil = async (req, res) => {
+        try {
+            const { ejendomsprofilID, navn, beskrivelse } = req.body;
+            await ejendomsprofilRepositorium.opdaterEjendomsprofil(ejendomsprofilID, navn, beskrivelse);
+            res.status(200).json({ success: true });
+        } catch (fejl) {
+            console.error('Fejl i opdaterEjendomsprofil:', fejl);
+            res.status(500).json({ fejl: 'Kunne ikke opdatere ejendomsprofil' });
+        }
+    }
+
     gemEjendomsprofil = async (req, res) => {
         try {
             const { navn, beskrivelse, adresse, ejendomsdata } = req.body;

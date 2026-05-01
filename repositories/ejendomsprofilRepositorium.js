@@ -45,6 +45,19 @@ class EjendomsprofilRepositorium {
         `);
     }
 
+    async opdaterEjendomsprofil(ejendomsprofilID, navn, beskrivelse) {
+        const pool = await poolForbindelse;
+        const request = pool.request();
+        request.input('ejendomsprofilID', sql.Int,              ejendomsprofilID);
+        request.input('navn',             sql.NVarChar(255),    navn);
+        request.input('beskrivelse',      sql.NVarChar(sql.MAX), beskrivelse);
+        await request.query(`
+            UPDATE Ejendomsprofil
+            SET navn = @navn, beskrivelse = @beskrivelse
+            WHERE ejendomsprofilID = @ejendomsprofilID
+        `);
+    }
+
     async hentAlleEjendomsprofiler() {
         const pool = await poolForbindelse;
         const resultat = await pool.request().query(`

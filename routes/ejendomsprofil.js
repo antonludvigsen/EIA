@@ -11,4 +11,7 @@ router.get('/portefolje', ejendomsprofilController.visPortefølje);
 /* POST /api/ejendomsprofil/gem */
 router.post('/gem', ejendomsprofilController.gemEjendomsprofil);
 
+/* PUT /api/ejendomsprofil/opdater */
+router.put('/opdater', ejendomsprofilController.opdaterEjendomsprofil);
+
 module.exports = router;

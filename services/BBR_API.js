@@ -164,9 +164,14 @@ class BBR_API {
             boligareal = bygning.byg040BygningensSamledeErhvervsAreal;
         } else if (bygning.byg038SamletBygningsareal) { /* og her det bedste kald for huse */
             boligareal = bygning.byg038SamletBygningsareal;
+        } else if (bygning.byg039BygningensSamledeBoligAreal) { /* og en fallback just in case */
+            boligareal = bygning.byg039BygningensSamledeBoligAreal;
         }
 
-        let grundareal = bygning.byg039BygningensSamledeBoligAreal || null; /* igen, bedste bud på hvad det kunne være når man ser på de værdier vi får af test kald */
+        let grundareal = null;
+        if (bygning.byg039BygningensSamledeBoligAreal) { /* igen, bedste bud på hvad det kunne være når man ser på de værdier vi får af test kald */
+            grundareal = bygning.byg039BygningensSamledeBoligAreal;
+        }
 
         /* Vi går her ind og henter det specifikke antal af værelser fra BBR i /enhed */
         let antalVærelser = null;
@@ -180,6 +185,16 @@ class BBR_API {
                 if (enhedData && enhedData.length > 0) {
                     const enhed = enhedData[0];
                     antalVærelser = enhed.enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
+
+                    /* hvis er ikke blev fundet et boligareal fra /bygning laver vi et kald her som fallback */
+                    if (boligareal === null) {
+                        boligareal = enhed.enh027ArealTilBeboelse;
+                    }
+
+                    /* samme her */
+                    if (grundareal === null) {
+                        grundareal = enhed.enh027ArealTilBeboelse;
+                    }
                 }
             }
         } catch (enhedFejl) {
