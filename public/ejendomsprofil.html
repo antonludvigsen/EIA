@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="da">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EIA - Ejendomsprofil</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
   <!-- Ejendomsprofilsiden bruger præcis samme layout som forsiden, blot uden en hero og body, da vi ikke har brug for dette til indholdet af data vi vil vise. -->
 
@@ -34,7 +36,7 @@
     <div class="ejendom-indhold">
 
       <!-- BBR DATA -->
-      <div class="ejendom-data-kort">
+      <div class="ejendom-data">
         <h2 class="ejendom-data-titel">Ejendomsdata</h2>
         <div class="ejendom-data-grid">
           <div class="ejendom-data-felt">
@@ -64,6 +66,15 @@
         </div>
       </div>
 
+      <!-- KORT -->
+      <div class="ejendom-kort">
+        <h2 class="ejendom-data-titel">Luftfoto</h2>
+        <div class="kort-container">
+          <img id="luftfoto" src="" alt="Luftfoto af ejendommen">
+          <img id="matrikel" src="" alt="Matrikelkort">
+        </div>
+      </div>
+
     </div>
 
     <!-- GEM KNAP -->
@@ -83,22 +94,13 @@
 
       <div class="modal-felt">
         <label class="modal-label" for="profil-navn">Navn</label>
-        <input
-          type="text"
-          id="profil-navn"
-          class="modal-input"
-          placeholder="Indtast navn..."
-        >
+        <input type="text" id="profil-navn" class="modal-input" placeholder="Indtast navn...">
       </div>
 
       <div class="modal-felt">
         <label class="modal-label" for="profil-beskrivelse">Beskrivelse (valgfrit)</label>
-        <textarea
-          id="profil-beskrivelse"
-          class="modal-textarea"
-          placeholder="fx potentiel ejendomsprofil til investeringscase..."
-          rows="3"
-        ></textarea>
+        <textarea id="profil-beskrivelse" class="modal-textarea"
+          placeholder="fx potentiel ejendomsprofil til investeringscase..." rows="3"></textarea>
       </div>
 
       <div class="modal-knapper">
@@ -143,4 +145,5 @@
 
   <script src="/js/ejendomsprofil.js"></script>
 </body>
+
 </html>

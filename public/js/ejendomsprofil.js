@@ -3,9 +3,9 @@
 class EjendomsprofilUI {
 
     constructor() {
-        /* læs adresseId fra URL'en */
+        /* adresse-logik */
         const urlParametre = new URLSearchParams(window.location.search); /* er browserens indbyggede måde at læse URL-parametre på */
-        this.adresseId = urlParametre.get('adresseId');
+        this.adresseId = urlParametre.get('adresseId'); /* vi bygger videre på logikken fra adresse.js: "Ordrup Jagtvej 21, 2920 Charlottenlund" -> "0a3f50a3-eb37-32b8-e044-0003ba298018" */
 
         if (!this.adresseId) { /* hvis der ikke er et adresseId i URL'en, sender vi brugeren tilbage til forsiden */
             window.location.href = '/index.html';
@@ -20,10 +20,10 @@ class EjendomsprofilUI {
     /* henter her ejendomsdata fra vores backend når siden indlæses */
     async hentOgVisEjendomsdata() {
         try {
-            const svar = await fetch(`/api/ejendomsprofil/vis?adresseId=${encodeURIComponent(this.adresseId)}`);
+            const svar = await fetch(`/api/ejendomsprofil/vis?adresseId=${this.adresseId}`); /* bruger "0a3f50a3-eb37-32b8-e044-0003ba298018" og bygger URL'en */
             const data = await svar.json();
 
-            /* vis adresse i overskriften */
+            /* trækker de forskellige datatyper ud. logikken er data -> controlleren -> DAWA værdier*/
             const vejnavn = data.dawa.vejnavn;
             const husnummer = data.dawa.husnummer;
             const etage = data.dawa.etage;
@@ -82,6 +82,10 @@ class EjendomsprofilUI {
 
             const dato = new Date(data.bbr.senestHentet); /* henter datoen på det tidspunkt vi hentede dataen */
             document.getElementById('senestHentet').textContent = dato.toLocaleDateString('da-DK'); /* formatere datoen til læsbar dansk format */
+
+            /* vis luftfoto og matrikelkort af ejendommen */
+            document.getElementById('luftfoto').src = data.kort.luftfotoURL;
+            document.getElementById('matrikel').src = data.kort.matrikelURL;
 
         } catch (fejl) {
             console.error('Fejl ved hentning af ejendomsdata:', fejl);

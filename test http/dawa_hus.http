@@ -1,0 +1,38 @@
+
+
+## Ordrup Jagtvej 21, 2920 Charlottenlund: (søgningKodet)
+GET https://api.dataforsyningen.dk/autocomplete?q=$Ordrup%20Jagtvej%2021%2C%202920%20Charlottenlund&type=adresse
+
+
+##Output
+
+[
+  {
+    "data": {
+      "id": "0a3f50a3-eb37-32b8-e044-0003ba298018",
+      "status": 1,
+      "darstatus": 3,
+      "vejkode": "0620",
+      "vejnavn": "Ordrup Jagtvej",
+      "adresseringsvejnavn": "Ordrup Jagtvej",
+      "husnr": "21",
+      "etage": null,
+      "dør": null,
+      "supplerendebynavn": null,
+      "postnr": "2920",
+      "postnrnavn": "Charlottenlund",
+      "stormodtagerpostnr": null,
+      "stormodtagerpostnrnavn": null,
+      "kommunekode": "0157",
+      "adgangsadresseid": "0a3f507b-f767-32b8-e044-0003ba298018",
+      "x": 12.58693899,
+      "y": 55.76590962,
+      "href": "https://api.dataforsyningen.dk/adresser/0a3f50a3-eb37-32b8-e044-0003ba298018"
+    },
+    "stormodtagerpostnr": false,
+    "type": "adresse",
+    "tekst": "Ordrup Jagtvej 21, 2920 Charlottenlund",
+    "forslagstekst": "Ordrup Jagtvej 21, 2920 Charlottenlund",
+    "caretpos": 38
+  }
+]

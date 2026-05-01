@@ -1,0 +1,235 @@
+
+## Birkegade 3, 2200 København N
+
+## /bygning
+## husnummer=adgangsadresseid
+
+## "byg040BygningensSamledeErhvervsAreal": 60 (Boligareal)
+## "byg039BygningensSamledeBoligAreal": 640 (Grundareal)
+
+GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=0a3f507a-4503-32b8-e044-0003ba298018&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
+
+##Output:
+
+HTTP/1.1 200 OK
+Cache-Control: private
+Transfer-Encoding: chunked
+Content-Type: application/json; charset=UTF-8
+Server: datafordeler.dk
+SwitchboardPerformanceInMs: 94.2996
+Access-Control-Allow-Origin: *
+X-POWERED-BY: datafordeler.dk
+Date: Fri, 01 May 2026 09:41:15 GMT
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+[
+  {
+    "datafordelerOpdateringstid": "2021-04-03T00:28:38.504477+02:00",
+    "byg007Bygningsnummer": 1,
+    "byg021BygningensAnvendelse": "140",
+    "byg026Opførelsesår": 1889,
+    "byg032YdervæggensMateriale": "1",
+    "byg033Tagdækningsmateriale": "3",
+    "byg037KildeTilBygningensMaterialer": "1",
+    "byg038SamletBygningsareal": 590,
+    "byg039BygningensSamledeBoligAreal": 640,
+    "byg040BygningensSamledeErhvervsAreal": 60,
+    "byg041BebyggetAreal": 118,
+    "byg048AndetAreal": 58,
+    "byg053BygningsarealerKilde": "1",
+    "byg054AntalEtager": 5,
+    "byg056Varmeinstallation": "1",
+    "byg058SupplerendeVarme": "90",
+    "byg094Revisionsdato": "2017-10-02T19:25:50.596480+02:00",
+    "byg133KildeTilKoordinatsæt": "K",
+    "byg134KvalitetAfKoordinatsæt": "1",
+    "byg135SupplerendeOplysningOmKoordinatsæt": "11",
+    "byg136PlaceringPåSøterritorie": "0",
+    "byg404Koordinat": "POINT(723633.19 6177309.86)",
+    "byg406Koordinatsystem": "5",
+    "forretningshændelse": "Bygning",
+    "forretningsområde": "54.15.05.05",
+    "forretningsproces": "9",
+    "grund": "f6820b54-3f27-478a-8b7c-294c2d663e50",
+    "husnummer": "0a3f507a-4503-32b8-e044-0003ba298018",
+    "id_lokalId": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+    "id_namespace": "http://data.gov.dk/bbr/bygning",
+    "jordstykke": "10424301",
+    "kommunekode": "0101",
+    "registreringFra": "2019-01-14T08:58:09.730205+01:00",
+    "registreringsaktør": "BBR",
+    "status": "6",
+    "virkningFra": "2019-01-14T08:58:09.730205+01:00",
+    "virkningsaktør": "Registerfører",
+    "etageList": [
+      {
+        "id_lokalId": "d2739024-3580-4187-a8c1-7afe97fcfc11",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:11:21.581701+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "05",
+          "eta020SamletArealAfEtage": 85,
+          "eta021ArealAfUdnyttetDelAfTagetage": 50,
+          "eta025Etagetype": "1",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "d2739024-3580-4187-a8c1-7afe97fcfc11",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:19:21.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      },
+      {
+        "id_lokalId": "cd794179-3efe-4efd-a225-cdd24987c37e",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:49:12.970920+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "kl",
+          "eta020SamletArealAfEtage": 119,
+          "eta022Kælderareal": 15,
+          "eta025Etagetype": "2",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "cd794179-3efe-4efd-a225-cdd24987c37e",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2020-06-12T18:24:45.000022+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2020-06-12T18:24:45.000022+02:00",
+          "virkningsaktør": "BBR21"
+        }
+      },
+      {
+        "id_lokalId": "adb69473-eedf-4fba-9fad-11c1132f195b",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T22:55:18.888113+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "01",
+          "eta025Etagetype": "0",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "adb69473-eedf-4fba-9fad-11c1132f195b",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:19:21.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      },
+      {
+        "id_lokalId": "b0b277e0-530b-47b4-8f9f-19818c396eb0",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T22:56:28.972991+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "st",
+          "eta025Etagetype": "0",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "b0b277e0-530b-47b4-8f9f-19818c396eb0",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:19:21.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      },
+      {
+        "id_lokalId": "cfa34aa5-2941-487e-a662-a6e521e04a25",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:18:17.130189+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "02",
+          "eta025Etagetype": "0",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "cfa34aa5-2941-487e-a662-a6e521e04a25",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:19:21.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      },
+      {
+        "id_lokalId": "d4937ed1-e5c2-41d1-9262-d3dd016d64d6",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:25:23.202324+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "04",
+          "eta025Etagetype": "0",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "d4937ed1-e5c2-41d1-9262-d3dd016d64d6",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:19:21.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      },
+      {
+        "id_lokalId": "d68ab5d8-fa81-4676-8879-f33ff4164cb3",
+        "etage": {
+          "datafordelerOpdateringstid": "2021-04-03T23:30:20.437278+02:00",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "eta006BygningensEtagebetegnelse": "03",
+          "eta025Etagetype": "0",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "d68ab5d8-fa81-4676-8879-f33ff4164cb3",
+          "id_namespace": "http://data.gov.dk/bbr/etage",
+          "kommunekode": "0101",
+          "registreringFra": "2017-06-02T14:29:37.000000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2000-02-05T20:19:21.000000+01:00",
+          "virkningsaktør": "Konvertering2017"
+        }
+      }
+    ],
+    "opgangList": [
+      {
+        "id_lokalId": "88b0e526-80c0-46a6-b6ea-54b176fec54d",
+        "opgang": {
+          "datafordelerOpdateringstid": "2021-04-04T02:17:39.627618+02:00",
+          "adgangFraHusnummer": "0a3f507a-4503-32b8-e044-0003ba298018",
+          "bygning": "3f13eb40-1ef8-4fde-b610-79d64e9e50f5",
+          "forretningshændelse": "Bygning",
+          "forretningsområde": "54.15.05.05",
+          "forretningsproces": "0",
+          "id_lokalId": "88b0e526-80c0-46a6-b6ea-54b176fec54d",
+          "id_namespace": "http://data.gov.dk/bbr/opgang",
+          "kommunekode": "0101",
+          "opg020Elevator": "0",
+          "registreringFra": "2018-09-14T18:24:24.770000+02:00",
+          "registreringsaktør": "BBR",
+          "status": "6",
+          "virkningFra": "2018-09-14T18:24:24.770000+02:00",
+          "virkningsaktør": "BBR"
+        }
+      }
+    ]
+  }
+]

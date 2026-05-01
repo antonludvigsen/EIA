@@ -308,7 +308,7 @@ a {
 }
 
 /* ----------------------------------------------------------------- */
-/* Ejendomsprofil (stylingen bygger videre på forside elementerne, hvor vi adder de ting der specifikt skal bruges til denne del af siden */
+/* Ejendomsprofil (vi adder de ting der specifikt skal bruges til denne del af siden */
 
 .ejendom-sektion {
   min-height: 100vh;
@@ -334,10 +334,10 @@ a {
   margin-bottom: 40px;
 }
 
-.ejendom-data-kort {
+.ejendom-data {
+  flex: 2; /* fylder 2/3, så kan kort fylde det sidste 1/3 */
   background-color: var(--farve-hvid);
   padding: 40px;
-  flex: 1;
 }
 
 .ejendom-data-titel {
@@ -394,6 +394,46 @@ a {
 
 .ejendom-gem-knap:hover {
   background-color: var(--farve-accent-hover);
+}
+
+/* ----------------------------------------------------------------- */
+/* Kort (vi adder de ting der specifikt skal bruges til denne del af siden */
+
+.ejendom-kort {
+    flex: 1; /* fylder 1/3 */
+    background-color: var(--farve-hvid);
+    padding: 40px;
+}
+
+/* Containeren skal have en fast størrelse svarende til vores width/height i (KORT-API.js) */
+.kort-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+/* Selve markøren der rammer midten */
+.kort-container::after {
+    content: '📍'; /* sæter en nål på ejendommen */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Transform sikrer at det er midten af ikonet der rammer midten af kortet */
+    font-size: 32px;
+    z-index: 10; /* Sikrer at markøren ligger øverst */
+    pointer-events: none; /* Gør at man kan klikke på kortet bagved markøren */
+}
+
+.kort-container img {
+    width: 100%;
+    display: block;
+}
+
+#matrikel {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 /* ----------------------------------------------------------------- */

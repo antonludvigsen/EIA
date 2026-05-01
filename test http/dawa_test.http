@@ -1,3 +1,0 @@
-
-# Dette dokument bruges som test for http kald for DAWA-apiet
-GET https://api.dataforsyningen.dk/adresser?q=Howitzvej+60&format=json

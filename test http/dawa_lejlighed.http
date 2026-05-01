@@ -1,0 +1,34 @@
+
+# Birkegade 3, 2200 København N: (søgningKodet)
+GET https://api.dataforsyningen.dk/autocomplete?q=Birkegade%203%2C%20st%20th%2C%202200%20K%C3%B8benhavn%20N&type=adresse
+
+[
+  {
+    "data": {
+      "id": "0a3f509d-52ed-32b8-e044-0003ba298018",
+      "status": 1,
+      "darstatus": 3,
+      "vejkode": "0508",
+      "vejnavn": "Birkegade",
+      "adresseringsvejnavn": "Birkegade",
+      "husnr": "3",
+      "etage": "st",
+      "dør": "th",
+      "supplerendebynavn": null,
+      "postnr": "2200",
+      "postnrnavn": "København N",
+      "stormodtagerpostnr": null,
+      "stormodtagerpostnrnavn": null,
+      "kommunekode": "0101",
+      "adgangsadresseid": "0a3f507a-4503-32b8-e044-0003ba298018",
+      "x": 12.55817884,
+      "y": 55.68993709,
+      "href": "https://api.dataforsyningen.dk/adresser/0a3f509d-52ed-32b8-e044-0003ba298018"
+    },
+    "stormodtagerpostnr": false,
+    "type": "adresse",
+    "tekst": "Birkegade 3, st. th, 2200 København N",
+    "forslagstekst": "Birkegade 3, st. th, 2200 København N",
+    "caretpos": 37
+  }
+]

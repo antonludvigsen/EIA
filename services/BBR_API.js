@@ -116,11 +116,10 @@ class BBR_API {
 
         const brugernavn = process.env.BBR_BRUGERNAVN;
         const password = process.env.BBR_PASSWORD;
-        const adresseId = encodeURIComponent(adgangsAdresseId);
 
         /* Vi bruger forskellige endpoint kald, da dette er nødsaget for at få fat i antal værelser og grundarealet */
-        const bygningURL = `https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=${adresseId}&username=${brugernavn}&password=${password}&format=JSON`;
-        
+        const bygningURL = `https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=${adgangsAdresseId}&username=${brugernavn}&password=${password}&format=JSON`;
+
         /* Opbygning af BBR kald: "https://services.datafordeler.dk/BBR/BBRPublic/1/REST/" er det plain kald, herfra bygges der ovenpå
         1:      "bygning" endpoint til BBR's bygning-metode
         2:      "?" markerer starten på filtre vi sender med i kaldet
@@ -160,14 +159,18 @@ class BBR_API {
             byggeår = bygning.byg026Opførelsesår;
         }
 
+
+        // Vi tjekker om feltet findes og ikke er 0 eller null
         let boligareal = null;
-        if (bygning.byg039BygningensSamledeBoligAreal) {
-            boligareal = bygning.byg039BygningensSamledeBoligAreal;
+        if (bygning.byg040BygningensSamledeErhvervsAreal) { /* for lejligheder */
+            boligareal = bygning.byg040BygningensSamledeErhvervsAreal;
+        } else if (bygning.byg038SamletBygningsareal) { /* for huse */
+            boligareal = bygning.byg038SamletBygningsareal;
         }
 
         let grundareal = null;
-        if (bygning.byg041BebyggetAreal) {
-            grundareal = bygning.byg041BebyggetAreal;
+        if (bygning.byg039BygningensSamledeBoligAreal) {
+            grundareal = bygning.byg039BygningensSamledeBoligAreal;
         }
 
         /* Vi går her ind og henter det specifikke antal af værelser fra BBR */
