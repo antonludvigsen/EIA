@@ -85,6 +85,110 @@
     <div class="footer-streg"></div>
   </footer>
 
+  <!-- INVESTERINGSCASE MODAL -->
+  <div class="modal-overlay" id="investering-modal-overlay">
+    <div class="modal">
+
+      <!-- STEP 1: Købsdetaljer -->
+      <div id="inv-step-1" style="display: flex; flex-direction: column; gap: 24px;">
+        <p class="modal-beskrivelse">Side 1 af 5 - Opret investeringscase</p>
+        <h2 class="modal-titel">Købsdetaljer 🏠</h2>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-ejendomspris">EJENDOMSPRIS (kr.) *</label>
+          <p class="modal-felt-beskrivelse">Den aftalte købspris for ejendommen før omkostninger og gebyrer.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-ejendomspris" placeholder="fx. 12.000.000">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-advokatudgifter">ADVOKATUDGIFTER (kr.)</label>
+          <p class="modal-felt-beskrivelse">Honorar til advokat eller juridisk rådgiver for gennemgang af købsaftale og skødeskrivning.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-advokatudgifter" placeholder="fx. 50.000">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-tinglysningsudgifter">TINGLYSNINGSUDGIFTER (kr.)</label>
+          <p class="modal-felt-beskrivelse">Offentlige gebyrer til staten for at tinglyse skøde og eventuelle pantebreve.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-tinglysningsudgifter" placeholder="fx. 15.000">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-overtagelsesudgifter">OVERTAGELSESUDGIFTER</label>
+          <p class="modal-felt-beskrivelse">Udgifter til køberrådgivning, byggeteknisk gennemgang eller øvrige omkostninger ved selve overtagelsen.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-overtagelsesudgifter" placeholder="fx. 5.000 kr.">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-koebsomkostninger">KØBSOMKOSTNINGER</label>
+          <p class="modal-felt-beskrivelse">Øvrige diverse omkostninger forbundet med handlen, som ikke falder under advokat eller tinglysning.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-koebsomkostninger" placeholder="fx. 5.000 kr.">
+        </div>
+        <div class="modal-knapper">
+          <button class="modal-annuller-knap" id="investering-modal-annuller">Annuller</button>
+          <button class="modal-gem-knap" id="investering-modal-naeste">Næste</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Lånedetaljer -->
+      <div id="inv-step-2" style="display: none; flex-direction: column; gap: 24px;">
+        <p class="modal-beskrivelse">Side 2 af 5 - Opret investeringscase</p>
+        <h2 class="modal-titel">Lånedetaljer 🏦</h2>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-laanebeloeb">LÅNEBELØB</label>
+          <p class="modal-felt-beskrivelse">Det samlede beløb, der skal lånes i banken eller realkreditinstituttet.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-laanebeloeb" placeholder="fx. 5.000.000 kr.">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-rente">RENTE</label>
+          <p class="modal-felt-beskrivelse">Den årlige nominelle rente på lånet angivet i procent.</p>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-rente" placeholder="fx. 1,5 %">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-loebetid">LØBETID</label>
+          <p class="modal-felt-beskrivelse">Lånets samlede varighed angivet i antal år.</p>
+          <input class="modal-input" type="number" min="1" max="30" step="1" id="inv-loebetid" placeholder="fx. 15 år">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-afdragsfri">AFDRAGSFRI PERIODE</label>
+          <p class="modal-felt-beskrivelse">Antal år i starten af lånets løbetid, hvor der kun betales renter og ikke afdrag på gælden.</p>
+          <input class="modal-input" type="number" min="0" step="1" id="inv-afdragsfri" placeholder="fx. 5 år">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-laanetype">LÅNETYPE</label>
+          <p class="modal-felt-beskrivelse">Vælg den specifikke låneform der anvendes til finansieringen.</p>
+          <select class="modal-input" id="inv-laanetype">
+            <option value="">Vælg lånetype</option>
+            <option value="Realkreditlaan">Realkreditlån</option>
+            <option value="Banklaan">Banklån</option>
+            <option value="Andelsboliglaan">Andelsboliglån</option>
+            <option value="Privatlaan">Privatlån</option>
+          </select>
+        </div>
+        <div class="modal-knapper">
+          <button class="modal-annuller-knap" id="inv-step2-tilbage">Tilbage</button>
+          <button class="modal-gem-knap" id="inv-step2-naeste">Næste</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Renovering & Forbedring -->
+      <div id="inv-step-3" style="display: none; flex-direction: column; gap: 24px;">
+        <p class="modal-beskrivelse">Side 3 af 5 - Opret investeringscase</p>
+        <h2 class="modal-titel">Renovering & Forbedring 🔨</h2>
+        <div class="modal-felt">
+          <label class="modal-label">PLANLAGTE RENOVERINGER OG FORBEDRINGER</label>
+          <p class="modal-felt-beskrivelse">Det samlede beløb du forventer at bruge på at istandsætte ejendommen. Tilføj én post per renovering.</p>
+          <div id="inv-renovering-liste" style="display: flex; flex-direction: column; gap: 12px;"></div>
+          <button type="button" class="modal-tilfoej-knap" id="inv-tilfoej-renovering">Tilføj udgift</button>
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-renoveringstidspunkt">RENOVERINGSTIDSPUNKT (ÅR)</label>
+          <p class="modal-felt-beskrivelse">Angiv hvilket år efter købet de planlagte renoveringer forventes udført.</p>
+          <input class="modal-input" type="number" min="0" step="1" id="inv-renoveringstidspunkt" placeholder="fx. 2">
+        </div>
+        <div class="modal-knapper">
+          <button class="modal-annuller-knap" id="inv-step3-tilbage">Tilbage</button>
+          <button class="modal-gem-knap" id="inv-step3-naeste">Næste</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- OPDATER MODAL -->
   <div class="modal-overlay" id="opdater-modal-overlay">
     <div class="modal">
