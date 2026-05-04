@@ -155,14 +155,6 @@ class BBR_API {
         /* BYGGEÅR */
         let byggeår = bygning.byg026Opførelsesår || null;
 
-        /* BOLIGAREAL */
-        let boligareal = null;
-        if (bygning.byg040BygningensSamledeErhvervsAreal) { /* det mest effektive areal vi fandt for lejligheder */
-            boligareal = bygning.byg040BygningensSamledeErhvervsAreal;
-        } else if (bygning.byg039BygningensSamledeBoligAreal) { /* ellers ligger arealet i selve boligarealet. Dette fungerer ikke for lejligheder, da det returnerer hele bygningen */
-            boligareal = bygning.byg039BygningensSamledeBoligArealM
-        }
-    
         /* GRUNDAREAL */
         let grundareal = null;
         try {
@@ -189,9 +181,9 @@ class BBR_API {
             grundareal = null;
         }
 
-        /* ANTAL VÆRELSER */
-        /* Vi går her ind og henter det specifikke antal af værelser fra BBR i /enhed */
+        /* ANTAL VÆRELSER & BOLIGAREAL - Vi går her ind og henter det specifikke antal af værelser samt boligareal af lejligheder fra BBR i /enhed */
         let antalVærelser = null;
+        let boligareal = null;
         try {
             const bygningId = encodeURIComponent(bygning.id_lokalId);
             const enhedURL = `https://services.datafordeler.dk/BBR/BBRPublic/1/REST/enhed?Bygning=${bygningId}&username=${brugernavn}&password=${password}&format=JSON`;
@@ -200,7 +192,9 @@ class BBR_API {
             if (enhedSvar.ok) {
                 const enhedData = await enhedSvar.json();
                 if (enhedData && enhedData.length > 0) {
-                    antalVærelser = enhedData[0].enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
+                    const enhed = enhedData[0];
+                    antalVærelser = enhed.enh031AntalVærelser || null;
+                    boligareal = enhed.enh026EnhedensSamledeAreal || null;
                 }
             }
 
