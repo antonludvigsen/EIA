@@ -68,7 +68,7 @@ a {
 
 .navbar-links a {
   color: var(--farve-hvid);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-bottom: 1px solid transparent;
@@ -812,4 +812,54 @@ select.modal-input,
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--farve-accent);
+}
+
+/* ----------------------------------------------------------------- */
+/* simuler case siden */
+.simuler-kontrol-række {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.simuler-dropdown,
+.simuler-input {
+  font-family: var(--skrift-serif);
+  font-size: 0.95rem;
+  color: var(--farve-tekst-moerk);
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  flex: 1;
+  min-width: 200px;
+}
+
+.simuler-dropdown:focus,
+.simuler-input:focus {
+  border-color: var(--farve-tekst-moerk);
+}
+
+.simuler-knap {
+  font-family: var(--skrift-serif);
+  font-size: 0.95rem;
+  background-color: var(--farve-accent);
+  color: #ffffff;
+  border: none;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+  white-space: nowrap;
+}
+
+.simuler-knap:hover:not(:disabled) {
+  background-color: #7a6025;
+}
+
+.simuler-knap:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

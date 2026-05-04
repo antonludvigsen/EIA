@@ -176,6 +176,8 @@ class Portefolje {
                 <p class="portefølje-kort-adresse">${this.undgåHTML(ic.ejendomsprofilNavn)}</p>
                 ${beskrivelse}
                 <span class="portefølje-kort-dato">Oprettet ${dato}</span>
+                <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.simulerCase(this.dataset.id)">Simuler case</button>
+                <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.sammenlignCase(this.dataset.id)">Sammenlign cases</button>
                 <div class="kort-knapper-række">
                   <button class="kort-knap-opdater"
                     data-id="${id}"
@@ -199,6 +201,14 @@ class Portefolje {
             console.error('Kunne ikke slette investeringscase:', fejl);
             alert('Der opstod en fejl. Prøv igen.');
         }
+    }
+
+    simulerCase(investeringscaseID) {
+        window.location.href = `/simuler_case.html?id=${investeringscaseID}`;
+    }
+
+    sammenlignCase(investeringscaseID) {
+        window.location.href = `/sammenlign_cases.html?id=${investeringscaseID}`;
     }
 
     /* bygger HTML-strengen for ét ejendomsprofilkort. Adressefelterne fra databasen samles til

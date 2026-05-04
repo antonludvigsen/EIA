@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EIA - Bruger</title>
+  <title>EIA - Simuler Case</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 
@@ -28,25 +28,24 @@
     </div>
   </nav>
 
-  <!-- BRUGER INDHOLD -->
-  <section class="bruger-sektion">
-    <div class="bruger-kort">
-      <h2 class="bruger-kort-titel">Brugerprofil</h2>
-      <div class="ejendom-data-grid">
-        <div class="ejendom-data-felt">
-          <span class="ejendom-data-label">Navn</span>
-          <span class="ejendom-data-værdi">EIA Bruger</span>
-        </div>
-        <div class="ejendom-data-felt">
-          <span class="ejendom-data-label">Bruger-ID</span>
-          <span class="ejendom-data-værdi">1</span>
-        </div>
-        <div class="ejendom-data-felt">
-          <span class="ejendom-data-label">Oprettet dato</span>
-          <span class="ejendom-data-værdi">2. april 2026</span>
-        </div>
-      </div>
+  <!-- SIMULER CASE INDHOLD -->
+  <section class="portefølje-sektion">
+
+    <div class="portefølje-header">
+      <h1 class="portefølje-titel">Simuler Case</h1>
+      <p class="portefølje-brodtekst">Vælg en af dine oprettede investeringscases og angiv en tidshorisont for at simulere udviklingen af din investering over tid.</p>
     </div>
+
+    <hr class="portefølje-divider">
+
+    <div class="simuler-kontrol-række">
+      <select id="case-dropdown" class="simuler-dropdown">
+        <option value="">Vælg investeringscase...</option>
+      </select>
+      <input type="number" id="tidshorisont-input" class="simuler-input" min="1" max="30" step="1" placeholder="Tidshorisont (år)">
+      <button id="simuler-knap" class="simuler-knap" disabled>Simuler</button>
+    </div>
+
   </section>
 
   <!-- FOOTER -->
@@ -84,6 +83,8 @@
     </div>
     <div class="footer-streg"></div>
   </footer>
+
+  <script src="/js/simuler_case.js"></script>
 
 </body>
 
