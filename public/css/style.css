@@ -618,6 +618,32 @@ select.modal-input,
   align-items: center;
 }
 
+.modal-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: var(--skrift-serif);
+  font-size: 0.95rem;
+  color: var(--farve-tekst-moerk);
+}
+
+.modal-toggle-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--farve-accent);
+  cursor: pointer;
+}
+
+.modal-input-formateret {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--farve-tekst-graa);
+  font-family: var(--skrift-serif);
+  margin-top: 4px;
+  min-height: 1em;
+}
+
 /* ----------------------------------------------------------------- */
 /* Styling til portefølje.html */
 
