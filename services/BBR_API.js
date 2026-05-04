@@ -128,25 +128,23 @@ class BBR_API {
         5:      "&password=${password}" sender passwordet fra .env
         6:      "&format=JSON" fortæller BBR at vi vil have svaret i JSON-format */
 
-        const svar = await fetch(bygningURL);
+        const bygningSvar = await fetch(bygningURL);
 
-        if (!svar.ok) {
-            throw new Error(`BBR-API fejl: ${svar.status}`);
+        if (!bygningSvar.ok) {
+            throw new Error(`BBR-API fejl: ${bygningSvar.status}`);
         }
 
-        const data = await svar.json();
+        const data = await bygningSvar.json();
 
         /* BBR returnerer et array af bygninger, vi tager den første */
         if (!data || data.length === 0) {
             throw new Error('Ingen BBR-data fundet for denne adresse');
         }
 
-        /* Udtrækker de relevante felter fra API'ets response vi skal bruge til ejendomsprofilen */
-        const bygning = data[0];
+        const bygning = data[0]; /* Udtrækker de relevante felter fra API'ets response vi skal bruge til ejendomsprofilen */
+        const ejendomsTypeKode = String(bygning.byg021BygningensAnvendelse); /* konverterer BBR's numeriske kode til string så den matcher nøglerne i kodelisten */
 
-        /* konverterer BBR's numeriske kode til string så den matcher nøglerne i kodelisten */
-        const ejendomsTypeKode = String(bygning.byg021BygningensAnvendelse);
-
+        /* EJENDOMSTYPE */
         let ejendomstype;
         if (ejendomsTypeKoder[ejendomsTypeKode]) {
             ejendomstype = ejendomsTypeKoder[ejendomsTypeKode]; /* slår koden op i kodelisten. Hvis koden ikke kendes, vises "Ukendt type" efterfulgt af koden */
@@ -154,25 +152,37 @@ class BBR_API {
             ejendomstype = `Ukendt type (${ejendomsTypeKode})`;
         }
 
-        let byggeår = null;
-        if (bygning.byg026Opførelsesår) {
-            byggeår = bygning.byg026Opførelsesår;
-        }
+        /* BYGGEÅR og BOLIGAREAL */
+        let byggeår = bygning.byg026Opførelsesår || null;
+        let boligareal = bygning.byg039BygningensSamledeBoligAreal || null;
 
-        let boligareal = null;
-        if (bygning.byg040BygningensSamledeErhvervsAreal) { /* bedste kald vi kunne finde der reflekterede lejligheder */
-            boligareal = bygning.byg040BygningensSamledeErhvervsAreal;
-        } else if (bygning.byg038SamletBygningsareal) { /* og her det bedste kald for huse */
-            boligareal = bygning.byg038SamletBygningsareal;
-        } else if (bygning.byg039BygningensSamledeBoligAreal) { /* og en fallback just in case */
-            boligareal = bygning.byg039BygningensSamledeBoligAreal;
-        }
-
+        /* GRUNDAREAL */
         let grundareal = null;
-        if (bygning.byg039BygningensSamledeBoligAreal) { /* igen, bedste bud på hvad det kunne være når man ser på de værdier vi får af test kald */
-            grundareal = bygning.byg039BygningensSamledeBoligAreal;
+        try {
+            let jordstykke = bygning.jordstykke; /* Hvis bygning.jordstykke er en URL eller en lang streng, skal vi kun bruge den sidste del (selve ID'et).*/
+
+            /* Vi udtrækker ID'et (sidste del efter sidste skråstreg eller bare selve værdien) */
+            const jordstykkeId = String(jordstykke).split('/').pop();
+            const matrikelURL = `https://services.datafordeler.dk/Matriklen2/Matrikel/1.0.0/rest/SamletFastEjendom?JordstykkeId=${jordstykkeId}&username=${brugernavn}&password=${password}&format=JSON`;
+            const matrikelSvar = await fetch(matrikelURL);
+
+            if (matrikelSvar.ok) {
+                const matrikelData = await matrikelSvar.json();
+
+                if (matrikelData && matrikelData.features && matrikelData.features.length > 0) {
+                    const properties = matrikelData.features[0].properties;
+
+                    if (properties.jordstykke && properties.jordstykke.length > 0) {
+                        grundareal = properties.jordstykke[0].properties.registreretAreal;
+                    }
+                }
+            }
+        } catch (matrikelFejl) {
+            console.error("Fejl i matrikel-search:", matrikelFejl);
+            grundareal = null;
         }
 
+        /* ANTAL VÆRELSER */
         /* Vi går her ind og henter det specifikke antal af værelser fra BBR i /enhed */
         let antalVærelser = null;
         try {
@@ -183,21 +193,12 @@ class BBR_API {
             if (enhedSvar.ok) {
                 const enhedData = await enhedSvar.json();
                 if (enhedData && enhedData.length > 0) {
-                    const enhed = enhedData[0];
-                    antalVærelser = enhed.enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
-
-                    /* hvis er ikke blev fundet et boligareal fra /bygning laver vi et kald her som fallback */
-                    if (boligareal === null) {
-                        boligareal = enhed.enh027ArealTilBeboelse;
-                    }
-
-                    /* samme her */
-                    if (grundareal === null) {
-                        grundareal = enhed.enh027ArealTilBeboelse;
-                    }
+                    antalVærelser = enhedData[0].enh031AntalVærelser || null; /* hvis antal værelser findes i BBR registeres sættes det til antallet, eller null */
                 }
             }
+
         } catch (enhedFejl) {
+            console.error("Fejl i enheds-search:", matrikelFejl);
             antalVærelser = null;
         }
 

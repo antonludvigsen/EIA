@@ -1,0 +1,123 @@
+
+GET https://services.datafordeler.dk/Matriklen2/Matrikel/1.0.0/rest/SamletFastEjendom?JordstykkeId=340621&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSON
+
+
+## Output
+##  "registreretAreal": 836
+
+HTTP/1.1 200 OK
+Cache-Control: private
+Transfer-Encoding: chunked
+Content-Type: application/json; charset=UTF-8
+Server: datafordeler.dk
+DataDistributor.ReceiptId: f3162b95-8e8a-44f4-8f62-e46b7363b243
+SwitchboardPerformanceInMs: 155.3787
+Access-Control-Allow-Origin: *
+X-POWERED-BY: datafordeler.dk
+Date: Mon, 04 May 2026 13:41:34 GMT
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "BFEnummer": 2037696,
+        "arbejderbolig": false,
+        "bygningPaaFremmedGrund": [],
+        "ejerlejlighed": [],
+        "erFaelleslod": false,
+        "forretningshaendelse": "Afledt ændring",
+        "sekundaerForretningshaendelse": [],
+        "forretningsomraade": "52.20.05",
+        "forretningsproces": "Anden sagskategori",
+        "hovedejendomOpdeltIEjerlejligheder": false,
+        "id_lokalId": "2037696",
+        "id_namespace": "http://data.gov.dk/Matriklen/SamletFastEjendom",
+        "jordstykke": [
+          {
+            "type": "Jordstykke",
+            "properties": {
+              "arealberegningsmetode": "Areal beregnet efter opmåling - o",
+              "arealbetegnelse": null,
+              "arealtype": null,
+              "brugsretsareal": false,
+              "centroide": [
+                {
+                  "geometri": "POINT(725030.062 6185850.945)",
+                  "senesteSagLokalId": "7319463",
+                  "status": "Gældende"
+                }
+              ],
+              "delnummer": null,
+              "ejerlavskode": 11054,
+              "ejerlavsnavn": "Ordrup",
+              "faelleslod": false,
+              "forretningshaendelse": "Afledt ændring",
+              "sekundaerForretningshaendelse": [],
+              "forretningsomraade": "52.20.05",
+              "forretningsproces": "Anden sagskategori",
+              "fredskov": {
+                "fredskovsareal": null,
+                "omfang": null
+              },
+              "id_lokalId": "340621",
+              "id_namespace": "http://data.gov.dk/Matriklen/Jordstykke",
+              "jordrente": {
+                "omfang": null
+              },
+              "klitfredning": {
+                "klitfredningsareal": null,
+                "omfang": null
+              },
+              "kommuneLokalId": "0157",
+              "majoratsskov": {
+                "majoratsskovsnummer": null,
+                "omfang": null
+              },
+              "matrikelnummer": "6pn",
+              "paataenktHandling": null,
+              "regionLokalId": "1084",
+              "registreretAreal": 836,
+              "registreringFra": "2018-06-03T06:34:59.772000+02:00",
+              "registreringTil": null,
+              "registreringsaktoer": "Matriklen",
+              "samletFastEjendomBFEnummer": 2037696,
+              "senesteSagLokalId": "7319463",
+              "skelforretningssagsLokalId": null,
+              "sognLokalId": "7116",
+              "stammerFraJordstykkeLokalId": null,
+              "status": "Gældende",
+              "stormfald": [],
+              "strandbeskyttelse": {
+                "omfang": null,
+                "strandbeskyttelsesareal": null
+              },
+              "supplerendeMaalingSagLokalId": null,
+              "vandarealinkludering": "Ukendt",
+              "vejareal": 0,
+              "vejarealberegningsstatus": "Vejareal beregnet",
+              "virkningFra": "1934-10-22T00:00:00.000000+01:00",
+              "virkningTil": null,
+              "virkningsaktoer": "Geodatastyrelsen"
+            }
+          }
+        ],
+        "landbrugsnotering": null,
+        "paataenktHandling": null,
+        "registreringFra": "2018-06-03T07:16:17.544000+02:00",
+        "registreringTil": null,
+        "registreringsaktoer": "Matriklen",
+        "senesteSagLokalId": "7319463",
+        "status": "Gældende",
+        "udskiltVej": false,
+        "virkningFra": "1934-10-22T00:00:00.000000+01:00",
+        "virkningTil": null,
+        "virkningsaktoer": "Geodatastyrelsen"
+      }
+    }
+  ]
+}
