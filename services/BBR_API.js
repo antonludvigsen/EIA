@@ -152,10 +152,17 @@ class BBR_API {
             ejendomstype = `Ukendt type (${ejendomsTypeKode})`;
         }
 
-        /* BYGGEÅR og BOLIGAREAL */
+        /* BYGGEÅR */
         let byggeår = bygning.byg026Opførelsesår || null;
-        let boligareal = bygning.byg039BygningensSamledeBoligAreal || null;
 
+        /* BOLIGAREAL */
+        let boligareal = null;
+        if (bygning.byg040BygningensSamledeErhvervsAreal) { /* det mest effektive areal vi fandt for lejligheder */
+            boligareal = bygning.byg040BygningensSamledeErhvervsAreal;
+        } else if (bygning.byg039BygningensSamledeBoligAreal) { /* ellers ligger arealet i selve boligarealet. Dette fungerer ikke for lejligheder, da det returnerer hele bygningen */
+            boligareal = bygning.byg039BygningensSamledeBoligArealM
+        }
+    
         /* GRUNDAREAL */
         let grundareal = null;
         try {
