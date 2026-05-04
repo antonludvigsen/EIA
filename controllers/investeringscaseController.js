@@ -64,6 +64,18 @@ class InvesteringscaseController {
         }
     }
 
+    duplikerInvesteringscase = async (req, res) => {
+        try {
+            const investeringscaseID = parseInt(req.params.id);
+            if (!investeringscaseID) return res.status(400).json({ fejl: 'investeringscaseID mangler' });
+            await investeringscaseRepositorium.duplikerInvesteringscase(investeringscaseID);
+            res.status(200).json({ success: true });
+        } catch (fejl) {
+            console.error('Fejl i duplikerInvesteringscase:', fejl);
+            res.status(500).json({ fejl: 'Kunne ikke duplikere investeringscase' });
+        }
+    }
+
     /* modtager id som URL-parameter via req.params.id. parseInt bruges fordi URL-parametre
        altid leveres som strenge, og repositoriet forventer et heltal som databasenøgle. */
     sletInvesteringscase = async (req, res) => {

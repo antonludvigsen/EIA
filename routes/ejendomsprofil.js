@@ -21,4 +21,7 @@ router.put('/opdater', ejendomsprofilController.opdaterEjendomsprofil);
 /* DELETE /api/ejendomsprofil/slet/:id */
 router.delete('/slet/:id', ejendomsprofilController.sletEjendomsprofil);
 
+/* POST /api/ejendomsprofil/dupliker/:id */
+router.post('/dupliker/:id', ejendomsprofilController.duplikerEjendomsprofil);
+
 module.exports = router;

@@ -675,6 +675,7 @@ select.modal-input,
     }
 
     .portefølje-kort {
+      position: relative;
       background-color: var(--farve-hvid);
       padding: 32px;
       display: flex;
@@ -705,6 +706,38 @@ select.modal-input,
       font-size: 0.875rem;
       color: var(--farve-tekst-graa);
       flex: 1;
+    }
+
+    .portefølje-kort-cases {
+      font-size: 0.82rem;
+      color: var(--farve-accent);
+      font-family: var(--skrift-serif);
+      font-style: italic;
+      margin: 0;
+    }
+
+    .kort-dupliker-knap {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: 1px solid #dddddd;
+      cursor: pointer;
+      color: var(--farve-tekst-graa);
+      font-size: 1rem;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .kort-dupliker-knap:hover {
+      color: var(--farve-tekst-moerk);
+      border-color: var(--farve-tekst-moerk);
     }
 
     .portefølje-kort-dato {
@@ -862,4 +895,12 @@ select.modal-input,
 .simuler-knap:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.simuler-fejl {
+  font-size: 0.78rem;
+  color: #c0392b;
+  font-family: var(--skrift-serif);
+  margin-top: 4px;
+  display: block;
 }

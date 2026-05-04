@@ -62,6 +62,76 @@ class InvesteringscaseRepositorium {
         `);
     }
 
+    /* duplikerer en eksisterende investeringscase ved at kopiere dens parametre og selve casen
+       til nye rækker. Fremmednøgle-rækkefølgen er den samme som i opretInvesteringscase. */
+    async duplikerInvesteringscase(investeringscaseID) {
+        const pool = await poolForbindelse;
+
+        /* hent eksisterende case og dens parametre via LEFT JOIN */
+        const hentRequest = pool.request();
+        hentRequest.input('id', sql.Int, investeringscaseID);
+        const hentResultat = await hentRequest.query(`
+            SELECT
+                ic.navn, ic.beskrivelse, ic.ejendomsprofilID,
+                ip.ejendomspris, ip.advokatudgifter, ip.tinglysningsudgifter,
+                ip.overtagelsesudgifter, ip.koebsomkostninger,
+                ip.laanebeloeb, ip.rente, ip.loebetid, ip.afdragsfriPeriode, ip.laanetype,
+                ip.planlagteRenoveringOgForbedringer, ip.renoveringstidspunkt,
+                ip.driftsomkostninger, ip.udlejning, ip.maanedligLeje, ip.udlejningsudgifter
+            FROM Investeringscase ic
+            LEFT JOIN InvesteringsParametre ip ON ic.investeringsparametreID = ip.investeringsparametreID
+            WHERE ic.investeringscaseID = @id
+        `);
+        if (hentResultat.recordset.length === 0) return;
+        const k = hentResultat.recordset[0];
+
+        /* 1. Indsæt kopi af InvesteringsParametre og hent nyt ID */
+        const paramRequest = pool.request();
+        paramRequest.input('ejendomspris',                      sql.Float,        k.ejendomspris ?? null);
+        paramRequest.input('advokatudgifter',                   sql.Float,        k.advokatudgifter ?? null);
+        paramRequest.input('tinglysningsudgifter',              sql.Float,        k.tinglysningsudgifter ?? null);
+        paramRequest.input('overtagelsesudgifter',              sql.Float,        k.overtagelsesudgifter ?? null);
+        paramRequest.input('koebsomkostninger',                 sql.Float,        k.koebsomkostninger ?? null);
+        paramRequest.input('laanebeloeb',                       sql.Float,        k.laanebeloeb ?? null);
+        paramRequest.input('rente',                             sql.Float,        k.rente ?? null);
+        paramRequest.input('loebetid',                          sql.Int,          k.loebetid ?? null);
+        paramRequest.input('afdragsfriPeriode',                 sql.Int,          k.afdragsfriPeriode ?? null);
+        paramRequest.input('laanetype',                         sql.NVarChar(50), k.laanetype ?? null);
+        paramRequest.input('planlagteRenoveringOgForbedringer', sql.Float,        k.planlagteRenoveringOgForbedringer ?? null);
+        paramRequest.input('renoveringstidspunkt',              sql.Int,          k.renoveringstidspunkt ?? null);
+        paramRequest.input('driftsomkostninger',                sql.Float,        k.driftsomkostninger ?? null);
+        paramRequest.input('udlejning',                         sql.Bit,          k.udlejning ? 1 : 0);
+        paramRequest.input('maanedligLeje',                     sql.Float,        k.maanedligLeje ?? null);
+        paramRequest.input('udlejningsudgifter',                sql.Float,        k.udlejningsudgifter ?? null);
+        const paramResultat = await paramRequest.query(`
+            INSERT INTO InvesteringsParametre (
+                ejendomspris, advokatudgifter, tinglysningsudgifter, overtagelsesudgifter, koebsomkostninger,
+                laanebeloeb, rente, loebetid, afdragsfriPeriode, laanetype,
+                planlagteRenoveringOgForbedringer, renoveringstidspunkt,
+                driftsomkostninger, udlejning, maanedligLeje, udlejningsudgifter
+            )
+            OUTPUT INSERTED.investeringsparametreID
+            VALUES (
+                @ejendomspris, @advokatudgifter, @tinglysningsudgifter, @overtagelsesudgifter, @koebsomkostninger,
+                @laanebeloeb, @rente, @loebetid, @afdragsfriPeriode, @laanetype,
+                @planlagteRenoveringOgForbedringer, @renoveringstidspunkt,
+                @driftsomkostninger, @udlejning, @maanedligLeje, @udlejningsudgifter
+            )
+        `);
+        const nyInvesteringsparametreID = paramResultat.recordset[0].investeringsparametreID;
+
+        /* 2. Indsæt kopi af selve casen med det nye parametreID */
+        const caseRequest = pool.request();
+        caseRequest.input('navn',                    sql.NVarChar(200),    k.navn);
+        caseRequest.input('beskrivelse',             sql.NVarChar(sql.MAX), k.beskrivelse ?? '');
+        caseRequest.input('ejendomsprofilID',        sql.Int,              k.ejendomsprofilID);
+        caseRequest.input('investeringsparametreID', sql.Int,              nyInvesteringsparametreID);
+        await caseRequest.query(`
+            INSERT INTO Investeringscase (navn, beskrivelse, ejendomsprofilID, investeringsparametreID)
+            VALUES (@navn, @beskrivelse, @ejendomsprofilID, @investeringsparametreID)
+        `);
+    }
+
     /* henter alle investeringscases med tilhørende profilnavn og ejendomspris til porteføljesiden.
        JOINer med Ejendomsprofil for at hente profilnavnet (vises under casens titel i UI'et),
        og LEFT JOINer med InvesteringsParametre fordi parametrene teknisk set kan mangle — vi

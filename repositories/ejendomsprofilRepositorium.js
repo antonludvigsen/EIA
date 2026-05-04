@@ -116,6 +116,67 @@ class EjendomsprofilRepositorium {
         await r7.query(`DELETE FROM Ejendomsdata WHERE ejendomsdataID = @ejendomsdataID`); /* ejendomsdata slettes sidst af samme grund */
     }
 
+    /* duplikerer en eksisterende ejendomsprofil ved at kopiere dens adresse, ejendomsdata og
+       selve profilen til nye rækker. Fremmednøgle-rækkefølgen er den samme som i gemEjendomsprofil. */
+    async duplikerEjendomsprofil(ejendomsprofilID) {
+        const pool = await poolForbindelse;
+
+        /* hent eksisterende profil med adresse og ejendomsdata via JOIN */
+        const hentRequest = pool.request();
+        hentRequest.input('id', sql.Int, ejendomsprofilID);
+        const hentResultat = await hentRequest.query(`
+            SELECT
+                ep.navn, ep.beskrivelse,
+                a.vejnavn, a.husnummer, a.postnummer, a.bynavn,
+                ed.ejendomstype, ed.byggeaar, ed.boligareal, ed.antalVaerelser, ed.grundareal
+            FROM Ejendomsprofil ep
+            JOIN Adresse a ON ep.adresseID = a.adresseID
+            JOIN Ejendomsdata ed ON ep.ejendomsdataID = ed.ejendomsdataID
+            WHERE ep.ejendomsprofilID = @id
+        `);
+        if (hentResultat.recordset.length === 0) return;
+        const k = hentResultat.recordset[0];
+
+        /* 1. Indsæt kopi af adresse og hent nyt adresseID */
+        const adresseRequest = pool.request();
+        adresseRequest.input('vejnavn',    sql.NVarChar(255), k.vejnavn);
+        adresseRequest.input('husnummer',  sql.NVarChar(20),  k.husnummer);
+        adresseRequest.input('postnummer', sql.NVarChar(10),  k.postnummer);
+        adresseRequest.input('bynavn',     sql.NVarChar(255), k.bynavn);
+        const adresseResultat = await adresseRequest.query(`
+            INSERT INTO Adresse (vejnavn, husnummer, postnummer, bynavn)
+            OUTPUT INSERTED.adresseID
+            VALUES (@vejnavn, @husnummer, @postnummer, @bynavn)
+        `);
+        const nyAdresseID = adresseResultat.recordset[0].adresseID;
+
+        /* 2. Indsæt kopi af ejendomsdata og hent nyt ejendomsdataID */
+        const ejendomsdataRequest = pool.request();
+        ejendomsdataRequest.input('ejendomstype',  sql.NVarChar(255), k.ejendomstype);
+        ejendomsdataRequest.input('byggeaar',       sql.Int,           k.byggeaar);
+        ejendomsdataRequest.input('boligareal',     sql.Float,         k.boligareal);
+        ejendomsdataRequest.input('antalVaerelser', sql.Int,           k.antalVaerelser);
+        ejendomsdataRequest.input('grundareal',     sql.Float,         k.grundareal);
+        const ejendomsdataResultat = await ejendomsdataRequest.query(`
+            INSERT INTO Ejendomsdata (ejendomstype, byggeaar, boligareal, antalVaerelser, grundareal)
+            OUTPUT INSERTED.ejendomsdataID
+            VALUES (@ejendomstype, @byggeaar, @boligareal, @antalVaerelser, @grundareal)
+        `);
+        const nyEjendomsdataID = ejendomsdataResultat.recordset[0].ejendomsdataID;
+
+        /* 3. Indsæt kopi af selve profilen med de to nye fremmednøgler */
+        const profilRequest = pool.request();
+        profilRequest.input('navn',           sql.NVarChar(255),    k.navn);
+        profilRequest.input('beskrivelse',    sql.NVarChar(sql.MAX), k.beskrivelse);
+        profilRequest.input('brugerID',       sql.Int,              1);
+        profilRequest.input('adresseID',      sql.Int,              nyAdresseID);
+        profilRequest.input('ejendomsdataID', sql.Int,              nyEjendomsdataID);
+        await profilRequest.query(`
+            INSERT INTO Ejendomsprofil (navn, beskrivelse, brugerID, adresseID, ejendomsdataID)
+            VALUES (@navn, @beskrivelse, @brugerID, @adresseID, @ejendomsdataID)
+        `);
+    }
+
     /* henter alle ejendomsprofiler med tilhørende adressedata til porteføljesiden.
        JOINer med Adresse-tabellen for at flette vejnavn, husnummer, postnummer og bynavn direkte
        ind i resultatet, så frontend slipper for et separat adresseopslag per profil. */
@@ -130,9 +191,15 @@ class EjendomsprofilRepositorium {
                 a.vejnavn,
                 a.husnummer,
                 a.postnummer,
-                a.bynavn
+                a.bynavn,
+                COUNT(ic.investeringscaseID) AS antalCases
             FROM Ejendomsprofil ep
             JOIN Adresse a ON ep.adresseID = a.adresseID  /* INNER JOIN: en profil uden adresse er ikke mulig i vores model */
+            LEFT JOIN Investeringscase ic ON ep.ejendomsprofilID = ic.ejendomsprofilID
+            GROUP BY
+                ep.ejendomsprofilID, ep.navn, ep.beskrivelse,
+                ep.oprettetDato, a.vejnavn, a.husnummer,
+                a.postnummer, a.bynavn
             ORDER BY ep.oprettetDato DESC  /* nyeste profil øverst */
         `);
         return resultat.recordset;

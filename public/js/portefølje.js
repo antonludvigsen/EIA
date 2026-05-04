@@ -172,6 +172,10 @@ class Portefolje {
             const id = ic.investeringscaseID;
             return `
               <div class="portefølje-kort">
+                <button class="kort-dupliker-knap"
+                  data-id="${id}"
+                  onclick="window.portefolje.duplikerInvesteringscase(this.dataset.id)"
+                  title="Duplikér investeringscase">⧉</button>
                 <h2 class="portefølje-kort-navn">${this.undgåHTML(ic.navn)}</h2>
                 <p class="portefølje-kort-adresse">${this.undgåHTML(ic.ejendomsprofilNavn)}</p>
                 ${beskrivelse}
@@ -203,6 +207,30 @@ class Portefolje {
         }
     }
 
+    async duplikerEjendomsprofil(id) {
+        if (!confirm('Du har trykket på dupliker. Vil du fortsætte?')) return;
+        try {
+            const svar = await fetch(`/api/ejendomsprofil/dupliker/${id}`, { method: 'POST' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke duplikere ejendomsprofil:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    async duplikerInvesteringscase(id) {
+        if (!confirm('Du har trykket på dupliker. Vil du fortsætte?')) return;
+        try {
+            const svar = await fetch(`/api/investeringscase/dupliker/${id}`, { method: 'POST' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke duplikere investeringscase:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
     simulerCase(investeringscaseID) {
         window.location.href = `/simuler_case.html?id=${investeringscaseID}`;
     }
@@ -226,8 +254,17 @@ class Portefolje {
 
         return `
           <div class="portefølje-kort">
+            <button class="kort-dupliker-knap"
+              data-id="${id}"
+              onclick="window.portefolje.duplikerEjendomsprofil(this.dataset.id)"
+              title="Duplikér ejendomsprofil">⧉</button>
             <h2 class="portefølje-kort-navn">${this.undgåHTML(profil.navn)}</h2>
             ${beskrivelse}
+            <p class="portefølje-kort-cases">
+              ${profil.antalCases === 1
+                ? '1 investeringscase tilknyttet'
+                : `${profil.antalCases} investeringscases tilknyttet`}
+            </p>
             <span class="portefølje-kort-dato">Oprettet ${dato}</span>
             <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.åbnInvesteringModal(this.dataset.id)">Opret investeringscase</button>
             <div class="kort-knapper-række">

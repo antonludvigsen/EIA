@@ -18,4 +18,7 @@ router.put('/opdater', investeringscaseController.opdaterInvesteringscase);
 /* DELETE /api/investeringscase/slet/:id */
 router.delete('/slet/:id', investeringscaseController.sletInvesteringscase);
 
+/* POST /api/investeringscase/dupliker/:id */
+router.post('/dupliker/:id', investeringscaseController.duplikerInvesteringscase);
+
 module.exports = router;

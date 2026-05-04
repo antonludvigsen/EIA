@@ -12,6 +12,14 @@ class SimulerCase {
         /* aktiver simuler-knappen kun når begge felter er udfyldt */
         this.dropdown.addEventListener('change', () => this.tjekKlarTilSimulering());
         this.tidInput.addEventListener('input',  () => this.tjekKlarTilSimulering());
+        this.knap.addEventListener('click', () => this.udfoerSimulering());
+
+        /* bloker decimaltegn og alle ikke-numeriske taster i tidshorisont-feltet */
+        const tilladteTider = new Set(['0','1','2','3','4','5','6','7','8','9',
+            'Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End']);
+        this.tidInput.addEventListener('keydown', (e) => {
+            if (!tilladteTider.has(e.key)) e.preventDefault();
+        });
     }
 
     /* henter alle investeringscases fra serveren og fylder dropdown med én option per case */
@@ -40,11 +48,30 @@ class SimulerCase {
         }
     }
 
-    /* aktiverer simuler-knappen når en case er valgt og tidshorisont er udfyldt */
+    /* aktiverer simuler-knappen når en case er valgt og tidshorisont er et helt tal >= 30 */
     tjekKlarTilSimulering() {
         const caseValgt = this.dropdown.value !== '';
-        const tidGyldig = this.tidInput.value !== '' && parseInt(this.tidInput.value) >= 1;
+        const val = parseInt(this.tidInput.value);
+        const tidGyldig = this.tidInput.value !== '' && Number.isInteger(val) && val >= 30;
         this.knap.disabled = !(caseValgt && tidGyldig);
+    }
+
+    udfoerSimulering() {
+        const tidshorisonten = this.tidInput.value;
+
+        /* fjern eventuel tidligere fejlbesked */
+        const gammelFejl = this.tidInput.parentElement.querySelector('.simuler-fejl');
+        if (gammelFejl) gammelFejl.remove();
+
+        if (parseInt(tidshorisonten) < 30) {
+            const fejlSpan = document.createElement('span');
+            fejlSpan.className = 'simuler-fejl';
+            fejlSpan.textContent = 'Tidshorisonten skal være mindst 30 år.';
+            this.tidInput.insertAdjacentElement('afterend', fejlSpan);
+            return;
+        }
+
+        console.log('Simulerer case:', this.dropdown.value, 'over', tidshorisonten, 'år');
     }
 }
 

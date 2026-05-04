@@ -83,6 +83,18 @@ class EjendomsprofilController {
         }
     }
 
+    duplikerEjendomsprofil = async (req, res) => {
+        try {
+            const ejendomsprofilID = parseInt(req.params.id);
+            if (!ejendomsprofilID) return res.status(400).json({ fejl: 'ejendomsprofilID mangler' });
+            await ejendomsprofilRepositorium.duplikerEjendomsprofil(ejendomsprofilID);
+            res.status(200).json({ success: true });
+        } catch (fejl) {
+            console.error('Fejl i duplikerEjendomsprofil:', fejl);
+            res.status(500).json({ fejl: 'Kunne ikke duplikere ejendomsprofil' });
+        }
+    }
+
     /* gemmer en ny ejendomsprofil med tilhørende adresse og ejendomsdata. Profilnavnet afledes
        automatisk fra adresseobjektet i formatet "vejnavn husnummer, postnummer bynavn", så brugeren
        ikke behøver at indtaste et navn — adressen er altid den præcise og entydige identifikator. */
