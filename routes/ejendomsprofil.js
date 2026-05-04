@@ -14,4 +14,7 @@ router.post('/gem', ejendomsprofilController.gemEjendomsprofil);
 /* PUT /api/ejendomsprofil/opdater */
 router.put('/opdater', ejendomsprofilController.opdaterEjendomsprofil);
 
+/* DELETE /api/ejendomsprofil/slet/:id */
+router.delete('/slet/:id', ejendomsprofilController.sletEjendomsprofil);
+
 module.exports = router;

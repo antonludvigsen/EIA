@@ -30,6 +30,11 @@ class Portefolje {
         const navn = this.opdaterNavn.value.trim();
         const beskrivelse = this.opdaterBeskrivelse.value.trim();
 
+        if (!navn) {
+            this.opdaterNavn.focus();
+            return;
+        }
+
         try {
             const svar = await fetch('/api/ejendomsprofil/opdater', {
                 method: 'PUT',
@@ -41,6 +46,19 @@ class Portefolje {
             location.reload();
         } catch (fejl) {
             console.error('Kunne ikke opdatere ejendomsprofil:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    async sletEjendomsprofil(id) {
+        if (!confirm('Er du sikker på, at du vil slette denne ejendomsprofil? Dette kan ikke fortrydes.')) return;
+        try {
+            const svar = await fetch(`/api/ejendomsprofil/slet/${id}`, { method: 'DELETE' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke slette ejendomsprofil:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
         }
     }
 
@@ -82,7 +100,7 @@ class Portefolje {
                 data-navn="${this.undgåHTML(profil.navn)}"
                 data-beskrivelse="${this.undgåHTML(profil.beskrivelse || '')}"
                 onclick="window.portefolje.åbnOpdaterModal(this.dataset.id, this.dataset.navn, this.dataset.beskrivelse)">Opdater</button>
-              <button class="kort-knap-slet" data-id="${id}" onclick="console.log('Slet:', this.dataset.id)">Slet</button>
+              <button class="kort-knap-slet" data-id="${id}" onclick="window.portefolje.sletEjendomsprofil(this.dataset.id)">Slet</button>
             </div>
           </div>`;
     }

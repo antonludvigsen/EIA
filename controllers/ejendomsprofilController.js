@@ -50,11 +50,28 @@ class EjendomsprofilController {
     opdaterEjendomsprofil = async (req, res) => {
         try {
             const { ejendomsprofilID, navn, beskrivelse } = req.body;
-            await ejendomsprofilRepositorium.opdaterEjendomsprofil(ejendomsprofilID, navn, beskrivelse);
+
+            if (!ejendomsprofilID || !navn || navn.trim() === '') {
+                return res.status(400).json({ fejl: 'ejendomsprofilID og navn er påkrævet' });
+            }
+
+            await ejendomsprofilRepositorium.opdaterEjendomsprofil(ejendomsprofilID, navn.trim(), beskrivelse ? beskrivelse.trim() : '');
             res.status(200).json({ success: true });
         } catch (fejl) {
             console.error('Fejl i opdaterEjendomsprofil:', fejl);
             res.status(500).json({ fejl: 'Kunne ikke opdatere ejendomsprofil' });
+        }
+    }
+
+    sletEjendomsprofil = async (req, res) => {
+        try {
+            const ejendomsprofilID = parseInt(req.params.id);
+            if (!ejendomsprofilID) return res.status(400).json({ fejl: 'ejendomsprofilID mangler' });
+            await ejendomsprofilRepositorium.sletEjendomsprofil(ejendomsprofilID);
+            res.status(200).json({ success: true });
+        } catch (fejl) {
+            console.error('Fejl i sletEjendomsprofil:', fejl);
+            res.status(500).json({ fejl: 'Kunne ikke slette ejendomsprofil' });
         }
     }
 

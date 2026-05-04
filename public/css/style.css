@@ -233,6 +233,14 @@ a {
   width: 100%;
 }
 
+.tekst-indhold {
+  font-family: var(--skrift-serif);
+  font-size: 1rem;
+  font-weight: normal;
+  margin-top: 40px;
+  line-height: 2;
+}
+
 /* ----------------------------------------------------------------- */
 /* Footeren */
 

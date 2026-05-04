@@ -17,8 +17,16 @@ const konfiguration = {
     }
 }; /* samler alle forbindelsesoplysninger. Vi læser dem fra .env i stedet for at hardkode dem direkte, så passwordet aldrig havner i kildekoden. */
 
-const pool = new sql.ConnectionPool(konfiguration); /* /* opretter en delt connection pool som alle repositorier genbruger (gør databaseforbindelse i Node.js mere effektiv) */
-const poolForbindelse = pool.connect(); /* starter forbindelsen asynkront og returnerer et promise. Vi gemmer det som poolForbindelse og eksporterer det */
+const pool = new sql.ConnectionPool(konfiguration); /* opretter en delt connection pool som alle repositorier genbruger (gør databaseforbindelse i Node.js mere effektiv) */
+
+/* sikrer at den hardcodede standardbruger (brugerID = 1) eksisterer i databasen */
+const poolForbindelse = pool.connect().then(async (pool) => {
+    await pool.request().query(`
+        IF NOT EXISTS (SELECT 1 FROM Bruger WHERE brugerID = 1)
+            INSERT INTO Bruger (navn) VALUES ('EIA Bruger')
+    `);
+    return pool;
+});
 
 module.exports = {
     sql, poolForbindelse

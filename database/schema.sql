@@ -50,11 +50,13 @@ CREATE TABLE Ejendomsprofil (
 /* InvesteringsParametre */
  CREATE TABLE InvesteringsParametre (
     investeringsparametreID           INT PRIMARY KEY IDENTITY(1,1),
+    /* KØBSDETALJER */
     ejendomspris                      FLOAT,
-    koebsomkostninger                 FLOAT,
     advokatudgifter                   FLOAT,
     tinglysningsudgifter              FLOAT,
     overtagelsesudgifter              FLOAT,
+    koebsomkostninger                 FLOAT,
+    /* LÅNEDETALJER */
     laanebeloeb                       FLOAT,
     rente                             FLOAT,
     loebetid                          INT,
@@ -65,10 +67,13 @@ CREATE TABLE Ejendomsprofil (
         'Andelsboliglaan',
         'Privatlaan'
     )),/* Vi laver en dropdown menu (check), så brugeren kan vælge mellem hvilket slags lån de har (påvirker ikke regnelogikken, blot til information) */
+    /* RENOVERINGS & FORBEDRING */
     planlagteRenoveringOgForbedringer FLOAT,
     renoveringstidspunkt              INT,
+    /* DRIFTSOMKOSTNINGER */
     driftsomkostninger                FLOAT,
-    udlejning                         BIT, /* 1/0 = true/false */
+    /* UDLEJNING */
+    udlejning                         BIT DEFAULT 0, /* 1/0 = true/false */
     maanedligLeje                     FLOAT,
     udlejningsudgifter                FLOAT
 );
@@ -116,11 +121,13 @@ CREATE TABLE Sammenligning (
     brugerID            INT NOT NULL FOREIGN KEY REFERENCES Bruger(brugerID)
 );
 
-/* Derudover har i oprettet en ekstra tabel i databasen som ikke indgår i DCD'et men i ER-diagrammet. Da vi har en many-to-many relation, skal der oprettes et mellemled for dette */
+/* Derudover har vi oprettet en ekstra tabel i databasen som ikke indgår i DCD'et men i ER-diagrammet. Da vi har en many-to-many relation, skal der oprettes et mellemled for dette */
 CREATE TABLE SammenligningCase (
+    sammenligningID     INT NOT NULL,
+    investeringscaseID  INT NOT NULL,
     PRIMARY KEY (sammenligningID, investeringscaseID),
-    sammenligningID     INT NOT NULL FOREIGN KEY REFERENCES Sammenligning(sammenligningID),
-    investeringscaseID  INT NOT NULL FOREIGN KEY REFERENCES Investeringscase(investeringscaseID)
+    FOREIGN KEY (sammenligningID) REFERENCES Sammenligning(sammenligningID),
+    FOREIGN KEY (investeringscaseID) REFERENCES Investeringscase(investeringscaseID)
 );
 
 /* --- TEST AF DB --- */
@@ -133,3 +140,21 @@ ORDER BY TABLE_NAME;
 
 /* Verificer at hardcodet bruger er oprettet */
 SELECT * FROM Bruger;
+
+/* --- RESET af DB --- */
+
+/* Fjern eksisterende tabeller i omvendt rækkefølge af afhængigheder for at undgå FK-fejl */
+
+DROP TABLE IF EXISTS SammenligningCase;
+DROP TABLE IF EXISTS Sammenligning;
+DROP TABLE IF EXISTS SimuleringResultat;
+DROP TABLE IF EXISTS Simulering;
+DROP TABLE IF EXISTS Investeringscase;
+DROP TABLE IF EXISTS InvesteringsParametre;
+DROP TABLE IF EXISTS Ejendomsprofil;
+DROP TABLE IF EXISTS Ejendomsdata;
+DROP TABLE IF EXISTS Adresse;
+DROP TABLE IF EXISTS Bruger;
+
+/* Herfra starter dit oprindelige script med CREATE TABLE... */
+
