@@ -32,7 +32,7 @@
     <!-- Sektion 1: Sideoverskrift -->
     <div class="portefølje-header">
       <h1 class="portefølje-titel">Min Portefølje</h1>
-      <p class="portefølje-brodtekst">På denne side kan du se hele overblikket over dine gemte ejendomsprofiler og dine oprettede investeringscases</p>
+      <p class="portefølje-brodtekst">På denne side kan du se hele overblikket over dine gemte ejendomsprofiler og dine oprettede investeringscases. For at komme i gang med en investeringscase, skal du først have gemt en ejendomsprofil.</p>
     </div>
 
     <!-- Sektion 2: Gemte Ejendomsprofiler -->
@@ -46,49 +46,16 @@
     <div class="portefølje-sub-sektion">
       <h2 class="portefølje-underoverskrift">Mine Investeringscases</h2>
       <hr class="portefølje-divider">
-      <div class="portefølje-grid"></div>
+      <div class="portefølje-grid" id="investeringscase-grid"></div>
     </div>
 
   </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-indhold">
-      <div class="footer-logo-sektion">
-        <img src="/billedemateriale/eia_hvidt_logo.png" alt="EIA Logo" class="footer-logo">
-        <p class="footer-copyright">© 2026 EIA. Alle rettigheder forbeholdes.</p>
-      </div>
-      <div class="footer-kolonne">
-        <h4 class="footer-overskrift">KONTAKT</h4>
-        <ul class="footer-liste">
-          <li>kontakt@eia.dk</li>
-          <li>+45 67 67 67 67</li>
-          <li>Solbjerg Plads 3, 2000 Frederiksberg</li>
-        </ul>
-      </div>
-      <div class="footer-kolonne">
-        <h4 class="footer-overskrift">NAVIGATION</h4>
-        <ul class="footer-liste">
-          <li><a href="/index.html">Forside</a></li>
-          <li><a href="/portefølje.html">Min Portefølje</a></li>
-        </ul>
-      </div>
-      <div class="footer-kolonne">
-        <h4 class="footer-overskrift">SOCIALE MEDIER</h4>
-        <ul class="footer-liste">
-          <li><a href="#">LinkedIn</a></li>
-          <li><a href="#">Instagram</a></li>
-          <li><a href="#">Twitter / X</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-streg"></div>
-  </footer>
-
+  
   <!-- INVESTERINGSCASE MODAL -->
   <div class="modal-overlay" id="investering-modal-overlay">
     <div class="modal">
-
+      
       <!-- STEP 1: Købsdetaljer -->
       <div id="inv-step-1" style="display: flex; flex-direction: column; gap: 24px;">
         <p class="modal-beskrivelse">Side 1 af 5 - Opret investeringscase</p>
@@ -123,7 +90,7 @@
           <button class="modal-gem-knap" id="investering-modal-naeste">Næste</button>
         </div>
       </div>
-
+      
       <!-- STEP 2: Lånedetaljer -->
       <div id="inv-step-2" style="display: none; flex-direction: column; gap: 24px;">
         <p class="modal-beskrivelse">Side 2 af 5 - Opret investeringscase</p>
@@ -164,7 +131,7 @@
           <button class="modal-gem-knap" id="inv-step2-naeste">Næste</button>
         </div>
       </div>
-
+      
       <!-- STEP 3: Renovering & Forbedring -->
       <div id="inv-step-3" style="display: none; flex-direction: column; gap: 24px;">
         <p class="modal-beskrivelse">Side 3 af 5 - Opret investeringscase</p>
@@ -185,7 +152,7 @@
           <button class="modal-gem-knap" id="inv-step3-naeste">Næste</button>
         </div>
       </div>
-
+      
       <!-- STEP 4: Driftsomkostninger -->
       <div id="inv-step-4" style="display: none; flex-direction: column; gap: 24px;">
         <p class="modal-beskrivelse">Side 4 af 5 - Opret investeringscase</p>
@@ -201,7 +168,7 @@
           <button class="modal-gem-knap" id="inv-step4-naeste">Næste</button>
         </div>
       </div>
-
+      
       <!-- STEP 5: Udlejning -->
       <div id="inv-step-5" style="display: none; flex-direction: column; gap: 24px;">
         <p class="modal-beskrivelse">Side 5 af 5 - Opret investeringscase</p>
@@ -226,23 +193,30 @@
             <input class="modal-input" type="number" min="0" step="0.01" id="inv-udlejningsudgifter" placeholder="fx. 2.500">
           </div>
         </div>
+        <hr class="modal-divider">
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-case-navn">NAVN *</label>
+          <p class="modal-felt-beskrivelse">Giv investeringscasen et navn, så du nemt kan genkende den i din portefølje.</p>
+          <input class="modal-input" type="text" id="inv-case-navn" placeholder="fx. Østerbro lejlighed 2026">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-case-beskrivelse">BESKRIVELSE</label>
+          <p class="modal-felt-beskrivelse">Tilføj en valgfri beskrivelse for at dokumentere din investeringsovervejelse.</p>
+          <textarea class="modal-textarea" id="inv-case-beskrivelse" rows="3" placeholder="fx. Potentiel korttidsudlejning via Airbnb..."></textarea>
+        </div>
         <div class="modal-knapper">
           <button class="modal-annuller-knap" id="inv-step5-tilbage">Tilbage</button>
           <button class="modal-gem-knap" id="inv-step5-opret">Opret investeringscase</button>
         </div>
       </div>
-
+      
     </div>
   </div>
-
+  
   <!-- OPDATER MODAL -->
   <div class="modal-overlay" id="opdater-modal-overlay">
     <div class="modal">
       <h2 class="modal-titel">Opdater ejendomsprofil</h2>
-      <div class="modal-felt">
-        <label class="modal-label" for="opdater-navn">NAVN</label>
-        <input class="modal-input" type="text" id="opdater-navn" placeholder="Navn på profil">
-      </div>
       <div class="modal-felt">
         <label class="modal-label" for="opdater-beskrivelse">BESKRIVELSE</label>
         <textarea class="modal-textarea" id="opdater-beskrivelse" rows="4" placeholder="Tilføj en beskrivelse..."></textarea>
@@ -253,9 +227,62 @@
       </div>
     </div>
   </div>
-
+  
+  <!-- OPDATER INVESTERINGSCASE MODAL -->
+  <div class="modal-overlay" id="opdater-investeringscase-modal-overlay">
+    <div class="modal">
+      <h2 class="modal-titel">Opdater investeringscase</h2>
+      <div class="modal-felt">
+        <label class="modal-label" for="opdater-ic-navn">NAVN</label>
+        <input class="modal-input" type="text" id="opdater-ic-navn">
+      </div>
+      <div class="modal-felt">
+        <label class="modal-label" for="opdater-ic-beskrivelse">BESKRIVELSE</label>
+        <textarea class="modal-textarea" id="opdater-ic-beskrivelse" rows="4"></textarea>
+      </div>
+      <div class="modal-knapper">
+        <button class="modal-annuller-knap" id="opdater-ic-modal-annuller">Annuller</button>
+        <button class="modal-gem-knap" id="opdater-ic-modal-gem">Gem ændringer</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-indhold">
+      <div class="footer-logo-sektion">
+        <img src="/billedemateriale/eia_hvidt_logo.png" alt="EIA Logo" class="footer-logo">
+        <p class="footer-copyright">© 2026 EIA. Alle rettigheder forbeholdes.</p>
+      </div>
+      <div class="footer-kolonne">
+        <h4 class="footer-overskrift">KONTAKT</h4>
+        <ul class="footer-liste">
+          <li>kontakt@eia.dk</li>
+          <li>+45 67 67 67 67</li>
+          <li>Solbjerg Plads 3, 2000 Frederiksberg</li>
+        </ul>
+      </div>
+      <div class="footer-kolonne">
+        <h4 class="footer-overskrift">NAVIGATION</h4>
+        <ul class="footer-liste">
+          <li><a href="/index.html">Forside</a></li>
+          <li><a href="/portefølje.html">Min Portefølje</a></li>
+        </ul>
+      </div>
+      <div class="footer-kolonne">
+        <h4 class="footer-overskrift">SOCIALE MEDIER</h4>
+        <ul class="footer-liste">
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Twitter / X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-streg"></div>
+  </footer>
+  
   <script src="/js/portefølje.js"></script>
-
+  
 </body>
 
 </html>

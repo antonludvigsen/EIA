@@ -1,3 +1,6 @@
+/* ejendomsprofilController.js modtager HTTP-kald fra routeren, validerer input og delegerer arbejdet til
+   ejendomsprofilRepositoriet. Derudover koordinerer den kald til DAWA_API, BBR_API og KORT_API, da
+   visEjendomsprofil kræver data fra alle tre eksterne tjenester samlet i ét svar til frontend. */
 
 const DAWA_API = require('../services/DAWA_API')
 const BBR_API = require('../services/BBR_API');
@@ -37,6 +40,7 @@ class EjendomsprofilController {
         }
     }
 
+    /* henter alle gemte ejendomsprofiler fra databasen og returnerer dem som JSON til porteføljesiden. */
     visPortefølje = async (req, res) => {
         try {
             const profiler = await ejendomsprofilRepositorium.hentAlleEjendomsprofiler();
@@ -47,15 +51,17 @@ class EjendomsprofilController {
         }
     }
 
+    /* opdaterer kun beskrivelsen på en eksisterende ejendomsprofil. Profilnavnet er fast og afledt
+       fra adressen ved oprettelse — det kan ikke ændres efterfølgende. */
     opdaterEjendomsprofil = async (req, res) => {
         try {
-            const { ejendomsprofilID, navn, beskrivelse } = req.body;
+            const { ejendomsprofilID, beskrivelse } = req.body;
 
-            if (!ejendomsprofilID || !navn || navn.trim() === '') {
-                return res.status(400).json({ fejl: 'ejendomsprofilID og navn er påkrævet' });
+            if (!ejendomsprofilID) {
+                return res.status(400).json({ fejl: 'ejendomsprofilID er påkrævet' });
             }
 
-            await ejendomsprofilRepositorium.opdaterEjendomsprofil(ejendomsprofilID, navn.trim(), beskrivelse ? beskrivelse.trim() : '');
+            await ejendomsprofilRepositorium.opdaterEjendomsprofil(ejendomsprofilID, beskrivelse ? beskrivelse.trim() : '');
             res.status(200).json({ success: true });
         } catch (fejl) {
             console.error('Fejl i opdaterEjendomsprofil:', fejl);
@@ -63,6 +69,8 @@ class EjendomsprofilController {
         }
     }
 
+    /* sletter en ejendomsprofil og alt tilknyttet data. Modtager id som URL-parameter,
+       som konverteres til int inden det sendes videre til repositoriet. */
     sletEjendomsprofil = async (req, res) => {
         try {
             const ejendomsprofilID = parseInt(req.params.id);
@@ -75,9 +83,13 @@ class EjendomsprofilController {
         }
     }
 
+    /* gemmer en ny ejendomsprofil med tilhørende adresse og ejendomsdata. Profilnavnet afledes
+       automatisk fra adresseobjektet i formatet "vejnavn husnummer, postnummer bynavn", så brugeren
+       ikke behøver at indtaste et navn — adressen er altid den præcise og entydige identifikator. */
     gemEjendomsprofil = async (req, res) => {
         try {
-            const { navn, beskrivelse, adresse, ejendomsdata } = req.body;
+            const { beskrivelse, adresse, ejendomsdata } = req.body;
+            const navn = `${adresse.vejnavn} ${adresse.husnummer}, ${adresse.postnummer} ${adresse.bynavn}`;
 
             await ejendomsprofilRepositorium.gemEjendomsprofil(navn, beskrivelse, adresse, ejendomsdata);
 

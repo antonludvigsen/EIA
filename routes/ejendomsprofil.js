@@ -1,3 +1,7 @@
+/* ejendomsprofil.js definerer de HTTP-endpoints der er tilgængelige under /api/ejendomsprofil/.
+   Hvert endpoint knyttes til en metode i controlleren — routerne indeholder ingen forretningslogik,
+   de videredelegerer blot kaldet til den rette controller-metode. */
+
 const express = require('express');
 const router = express.Router();
 const ejendomsprofilController = require('../controllers/ejendomsprofilController');

@@ -97,16 +97,18 @@ class EjendomsprofilUI {
         }
     }
 
+    /* sender den aktuelle ejendomsprofil til serveren som et POST-kald med beskrivelse, adresse og
+       ejendomsdata. Profilnavnet afledes på serversiden fra adresseobjektet — vi sender det ikke herfra.
+       this.dawaData og this.bbrData er gemt på instansen af hentOgVisEjendomsdata() og indeholder
+       det rå svar fra DAWA- og BBR-API'erne. */
     async gemEjendomsprofil() {
         try {
-            const navn = document.getElementById('profil-navn').value;
             const beskrivelse = document.getElementById('profil-beskrivelse').value;
 
             const svar = await fetch('/api/ejendomsprofil/gem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    navn,
                     beskrivelse,
                     adresse: this.dawaData,
                     ejendomsdata: this.bbrData
@@ -132,9 +134,6 @@ class EjendomsprofilUI {
 
         /* åbn modalen når brugeren trykker gem-knappen */
         this.gemKnap.addEventListener('click', () => {
-            /* forududfyld navn med adressen */
-            const adresseTekst = document.getElementById('ejendom-adresse').textContent;
-            document.getElementById('profil-navn').value = adresseTekst;
             this.modalOverlay.classList.add('aktiv');
         });
 

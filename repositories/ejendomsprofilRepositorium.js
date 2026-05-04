@@ -1,14 +1,21 @@
+/* ejendomsprofilRepositorium.js håndterer al direkte kommunikation med databasen for ejendomsprofiler.
+   Alle SQL-forespørgsler til tabellerne Ejendomsprofil, Adresse og Ejendomsdata er samlet her,
+   så resten af applikationen aldrig behøver kende til databasestrukturen eller SQL-syntaks. */
+
 const { sql, poolForbindelse } = require('../database/connection');
 
 class EjendomsprofilRepositorium {
 
+    /* gemmer en ny ejendomsprofil i tre trin: adresse, ejendomsdata og selve profilen.
+       Rækkefølgen er nødvendig fordi Ejendomsprofil refererer de to andre tabeller via fremmednøgler —
+       vi skal kende begge ID'er, inden vi kan indsætte profilen. */
     async gemEjendomsprofil(navn, beskrivelse, adresseData, ejendomsData) {
         const pool = await poolForbindelse;
 
         /* 1. Indsæt adresse og hent det auto-genererede adresseID */
         const adresseRequest = pool.request();
         adresseRequest.input('vejnavn',    sql.NVarChar(255), adresseData.vejnavn); /* sql.NVarChar bruges på alle tekstfelter så danske tegn (æøå) gemmes korrekt */
-        adresseRequest.input('husnummer',  sql.NVarChar(20),  adresseData.husnummer); 
+        adresseRequest.input('husnummer',  sql.NVarChar(20),  adresseData.husnummer);
         adresseRequest.input('postnummer', sql.NVarChar(10),  adresseData.postnummer);
         adresseRequest.input('bynavn',     sql.NVarChar(255), adresseData.bynavn);
         const adresseResultat = await adresseRequest.query(`
@@ -16,7 +23,7 @@ class EjendomsprofilRepositorium {
             OUTPUT INSERTED.adresseID
             VALUES (@vejnavn, @husnummer, @postnummer, @bynavn)
         `);
-        const adresseID = adresseResultat.recordset[0].adresseID;
+        const adresseID = adresseResultat.recordset[0].adresseID; /* OUTPUT INSERTED returnerer det nye ID direkte, så vi undgår et separat SELECT-kald */
 
         /* 2. Indsæt ejendomsdata og hent det auto-genererede ejendomsdataID */
         const ejendomsdataRequest = pool.request();
@@ -45,19 +52,23 @@ class EjendomsprofilRepositorium {
         `);
     }
 
-    async opdaterEjendomsprofil(ejendomsprofilID, navn, beskrivelse) {
+    /* opdaterer beskrivelsen på en eksisterende ejendomsprofil. Kun beskrivelse kan ændres —
+       navn er afledt fra adressen ved oprettelse og gemmes uforanderligt i databasen. */
+    async opdaterEjendomsprofil(ejendomsprofilID, beskrivelse) {
         const pool = await poolForbindelse;
         const request = pool.request();
         request.input('ejendomsprofilID', sql.Int,              ejendomsprofilID);
-        request.input('navn',             sql.NVarChar(255),    navn);
         request.input('beskrivelse',      sql.NVarChar(sql.MAX), beskrivelse);
         await request.query(`
             UPDATE Ejendomsprofil
-            SET navn = @navn, beskrivelse = @beskrivelse
+            SET beskrivelse = @beskrivelse
             WHERE ejendomsprofilID = @ejendomsprofilID
         `);
     }
 
+    /* sletter en ejendomsprofil og alt tilknyttet data. Rækkefølgen er bestemt af fremmednøgle-
+       afhængigheder — tabeller der refererer Ejendomsprofil slettes inden profilen selv, og
+       Adresse og Ejendomsdata slettes til sidst da profilen refererede dem. */
     async sletEjendomsprofil(ejendomsprofilID) {
         const pool = await poolForbindelse;
 
@@ -67,7 +78,7 @@ class EjendomsprofilRepositorium {
         const idResultat = await idRequest.query(`
             SELECT adresseID, ejendomsdataID FROM Ejendomsprofil WHERE ejendomsprofilID = @id
         `);
-        if (idResultat.recordset.length === 0) return;
+        if (idResultat.recordset.length === 0) return; /* profilen eksisterer ikke — intet at slette */
         const { adresseID, ejendomsdataID } = idResultat.recordset[0];
 
         /* slet i rækkefølge der respekterer FK-afhængigheder */
@@ -75,7 +86,7 @@ class EjendomsprofilRepositorium {
         await r1.query(`
             DELETE FROM SammenligningCase
             WHERE investeringscaseID IN (SELECT investeringscaseID FROM Investeringscase WHERE ejendomsprofilID = @id)
-        `);
+        `); /* SammenligningCase refererer Investeringscase, som refererer Ejendomsprofil — to niveauer dybere */
 
         const r2 = pool.request(); r2.input('id', sql.Int, ejendomsprofilID);
         await r2.query(`
@@ -84,7 +95,7 @@ class EjendomsprofilRepositorium {
                 SELECT simuleringID FROM Simulering
                 WHERE investeringscaseID IN (SELECT investeringscaseID FROM Investeringscase WHERE ejendomsprofilID = @id)
             )
-        `);
+        `); /* tre niveauer dybere — slettes via dobbelt subquery */
 
         const r3 = pool.request(); r3.input('id', sql.Int, ejendomsprofilID);
         await r3.query(`
@@ -99,12 +110,15 @@ class EjendomsprofilRepositorium {
         await r5.query(`DELETE FROM Ejendomsprofil WHERE ejendomsprofilID = @id`);
 
         const r6 = pool.request(); r6.input('adresseID', sql.Int, adresseID);
-        await r6.query(`DELETE FROM Adresse WHERE adresseID = @adresseID`);
+        await r6.query(`DELETE FROM Adresse WHERE adresseID = @adresseID`); /* adresse slettes efter profilen, da profilen refererede den */
 
         const r7 = pool.request(); r7.input('ejendomsdataID', sql.Int, ejendomsdataID);
-        await r7.query(`DELETE FROM Ejendomsdata WHERE ejendomsdataID = @ejendomsdataID`);
+        await r7.query(`DELETE FROM Ejendomsdata WHERE ejendomsdataID = @ejendomsdataID`); /* ejendomsdata slettes sidst af samme grund */
     }
 
+    /* henter alle ejendomsprofiler med tilhørende adressedata til porteføljesiden.
+       JOINer med Adresse-tabellen for at flette vejnavn, husnummer, postnummer og bynavn direkte
+       ind i resultatet, så frontend slipper for et separat adresseopslag per profil. */
     async hentAlleEjendomsprofiler() {
         const pool = await poolForbindelse;
         const resultat = await pool.request().query(`
@@ -118,8 +132,8 @@ class EjendomsprofilRepositorium {
                 a.postnummer,
                 a.bynavn
             FROM Ejendomsprofil ep
-            JOIN Adresse a ON ep.adresseID = a.adresseID
-            ORDER BY ep.oprettetDato DESC
+            JOIN Adresse a ON ep.adresseID = a.adresseID  /* INNER JOIN: en profil uden adresse er ikke mulig i vores model */
+            ORDER BY ep.oprettetDato DESC  /* nyeste profil øverst */
         `);
         return resultat.recordset;
     }

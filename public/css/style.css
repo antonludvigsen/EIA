@@ -635,13 +635,10 @@ select.modal-input,
   cursor: pointer;
 }
 
-.modal-input-formateret {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--farve-tekst-graa);
-  font-family: var(--skrift-serif);
-  margin-top: 4px;
-  min-height: 1em;
+.modal-divider {
+  border: none;
+  border-top: 1px solid var(--farve-accent);
+  margin: 0;
 }
 
 /* ----------------------------------------------------------------- */
