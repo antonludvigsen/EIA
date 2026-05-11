@@ -7,16 +7,14 @@
   --farve-hvid: #ffffff;
   --farve-tekst-moerk: #111111;
   --farve-tekst-graa: #555555;
-
   --skrift-serif: Georgia, 'Times New Roman', serif;
-
   --farve-accent: #9a7b2f;
   --farve-accent-hover: #b08f38;
 }
 
 /* ----------------------------------------------------------------- */
 /* Fjerner browserens standardmargins og sætter box-sizing */
-*, *::before, *::after {
+*, *::before, *::after { 
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -47,7 +45,7 @@ a {
   width: 100%;
   z-index: 100; /* z-index: bruges som "lag", altså hvis den sættes til 100 sikres det, at navbaren ligger oven på alt andet indhold når man scroller forbi sektioner. */
   background-color: var(--farve-moerk-groen);
-  display: flex; /* display: flex med justify-content: space-between placerer de tre elementer, logo, links og bruger-knap, med maksimal afstand imellem sig. */
+  display: flex; /* display: flex med justify-content og space-between placerer de tre elementer, logo, links og bruger-knap centralt og med maksimal afstand imellem sig. */
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
@@ -136,8 +134,7 @@ a {
   line-height: 1.2;
 }
 
-.hero-titel,
-.hero-søg-wrapper {
+.hero-titel, .hero-søg-wrapper {
   position: relative;
   z-index: 1;
 }
@@ -163,7 +160,7 @@ a {
 }
 
 /* ----------------------------------------------------------------- */
-/* DAWA Autocomplete2 komponenten styler dropdown-listen der vises under søgefeltet */
+/* "DAWA Autocomplete2"-komponenten styler dropdown listen der vises under søgefeltet */
 
 .autocomplete-container {
   position: relative; /* relativ positionering så dropdown placeres korrekt under inputfeltet */
@@ -209,7 +206,7 @@ a {
 }
 
 /* ----------------------------------------------------------------- */
-/* Indhold: "Sådan fungerer det"-sektionen */
+/* Indhold: "Sådan fungerer det" sektionen */
 
 .indhold {
   background-color: var(--farve-lys-graa);
@@ -343,7 +340,7 @@ a {
 }
 
 .ejendom-data {
-  flex: 2; /* fylder 2/3, så kan kort fylde det sidste 1/3 */
+  flex: 2; /* fylder 2/3, så kan kort fylde den sidste 1/3 */
   background-color: var(--farve-hvid);
   padding: 40px;
 }
@@ -405,50 +402,38 @@ a {
 }
 
 /* ----------------------------------------------------------------- */
-/* Kort (vi adder de ting der specifikt skal bruges til denne del af siden */
+/* Kort (vi adder de ting der specifikt skal bruges til denne del af siden) */
 
 .ejendom-kort {
-    flex: 1; /* fylder 1/3 */
-    background-color: var(--farve-hvid);
-    padding: 40px;
+  flex: 1; /* fylder 1/3, mens som sagt før at ejendomsdata fylder de resterende 2/3 */
+  background-color: var(--farve-hvid);
+  padding: 40px;
 }
 
 /* Containeren skal have en fast størrelse svarende til vores width/height i (KORT-API.js) */
 .kort-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border: 1px solid #ccc;
-}
-
-/* Selve markøren der rammer midten */
-.kort-container::after {
-    content: '📍'; /* sæter en nål på ejendommen */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Transform sikrer at det er midten af ikonet der rammer midten af kortet */
-    font-size: 32px;
-    z-index: 10; /* Sikrer at markøren ligger øverst */
-    pointer-events: none; /* Gør at man kan klikke på kortet bagved markøren */
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #ccc;
 }
 
 .kort-container img {
-    width: 100%;
-    display: block;
+  width: 100%;
+  display: block;
 }
 
 #matrikel {
-    position: absolute;
-    top: 0;
-    left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* ----------------------------------------------------------------- */
 /* Modal logik (udfyldningsboks der popper op både for "Gem ejendosprofil" og "Opret investeringscase" */
 
 .modal-overlay {
-  display: none; /* skjult som standard, vises via JavaScript */
+  display: none; /* skjult som standard, vises via JS */
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.6);
@@ -458,7 +443,7 @@ a {
 }
 
 .modal-overlay.aktiv {
-  display: flex; /* vises når JavaScript tilføjer klassen aktiv */
+  display: flex; /* vises når JS tilføjer klassen aktiv */
 }
 
 .modal {
@@ -466,6 +451,8 @@ a {
   padding: 48px;
   width: 100%;
   max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -612,11 +599,6 @@ select.modal-input,
   gap: 8px;
 }
 
-.renovering-række {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
 
 .modal-toggle-label {
   display: flex;
@@ -645,178 +627,187 @@ select.modal-input,
 /* Styling til portefølje.html */
 
 .portefølje-sektion {
-      min-height: 100vh;
-      background-color: var(--farve-moerk-groen);
-      padding: 120px 80px 80px 80px;
-    }
+  min-height: 100vh;
+  background-color: var(--farve-moerk-groen);
+  padding: 120px 80px 80px 80px;
+}
 
-    .portefølje-header {
-      margin-bottom: 48px;
-    }
+.portefølje-header {
+  margin-bottom: 48px;
+}
 
-    .portefølje-titel {
-      font-family: var(--skrift-serif);
-      font-size: 2.5rem;
-      font-weight: normal;
-      color: var(--farve-hvid);
-      margin-bottom: 12px;
-    }
+.portefølje-titel {
+  font-family: var(--skrift-serif);
+  font-size: 2.5rem;
+  font-weight: normal;
+  color: var(--farve-hvid);
+  margin-bottom: 12px;
+}
 
-    .portefølje-undertitel {
-      font-size: 0.95rem;
-      color: var(--farve-tekst-graa);
-    }
 
-    .portefølje-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
-      margin-top: 32px;
-    }
+.portefølje-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
 
-    .portefølje-kort {
-      position: relative;
-      background-color: var(--farve-hvid);
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      transition: box-shadow 0.2s;
-    }
+.portefølje-kort {
+  background-color: var(--farve-hvid);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.2s;
+}
 
-    .portefølje-kort:hover {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
+.portefølje-kort:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
 
-    .portefølje-kort-navn {
-      font-family: var(--skrift-serif);
-      font-size: 1.2rem;
-      font-weight: normal;
-      color: var(--farve-tekst-moerk);
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--farve-accent);
-    }
+.portefølje-kort-navn {
+  font-family: var(--skrift-serif);
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: var(--farve-tekst-moerk);
+}
 
-    .portefølje-kort-adresse {
-      font-size: 0.9rem;
-      color: var(--farve-tekst-moerk);
-    }
+.portefølje-kort-adresse {
+  font-size: 0.9rem;
+  color: var(--farve-tekst-moerk);
+}
 
-    .portefølje-kort-beskrivelse {
-      font-size: 0.875rem;
-      color: var(--farve-tekst-graa);
-      flex: 1;
-    }
+.portefølje-kort-beskrivelse {
+  font-size: 0.875rem;
+  color: var(--farve-tekst-graa);
+  flex: 1;
+  margin-top: 10px;
+}
 
-    .portefølje-kort-cases {
-      font-size: 0.82rem;
-      color: var(--farve-accent);
-      font-family: var(--skrift-serif);
-      font-style: italic;
-      margin: 0;
-    }
+.portefølje-kort-cases {
+  font-size: 0.82rem;
+  color: var(--farve-accent);
+  font-family: var(--skrift-serif);
+  font-style: italic;
+  margin: 0;
+}
 
-    .kort-dupliker-knap {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: none;
-      border: 1px solid #dddddd;
-      cursor: pointer;
-      color: var(--farve-tekst-graa);
-      font-size: 1rem;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-      transition: color 0.2s, border-color 0.2s;
-    }
+.kort-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
 
-    .kort-dupliker-knap:hover {
-      color: var(--farve-tekst-moerk);
-      border-color: var(--farve-tekst-moerk);
-    }
+.kort-header-knapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
 
-    .portefølje-kort-dato {
-      font-size: 0.8rem;
-      color: var(--farve-tekst-graa);
-      letter-spacing: 0.04em;
-    }
+.kort-info-knap,
+.kort-dupliker-knap {
+  position: static;
+  background: none;
+  border: 1px solid #dddddd;
+  cursor: pointer;
+  color: var(--farve-tekst-graa);
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s, border-color 0.2s;
+}
 
-    .portefølje-tom {
-      color: var(--farve-tekst-graa);
-      font-size: 1rem;
-    }
+.kort-info-knap:hover,
+.kort-dupliker-knap:hover {
+  color: var(--farve-tekst-moerk);
+  border-color: var(--farve-tekst-moerk);
+}
 
-    .portefølje-brodtekst {
-      font-size: 0.95rem;
-      color: var(--farve-lys-graa);
-      margin-bottom: 32px;
-    }
+.kort-divider {
+  border: none;
+  border-top: 1px solid var(--farve-accent);
+  margin: -8px 0;
+}
 
-    .portefølje-divider {
-      border: none;
-      border-top: 1px solid var(--farve-accent);
-      width: 100%;
-    }
+.portefølje-kort-dato {
+  font-size: 0.8rem;
+  color: var(--farve-tekst-graa);
+  letter-spacing: 0.04em;
+}
 
-    .portefølje-sub-sektion {
-      margin-bottom: 64px;
-    }
+.portefølje-brodtekst {
+  font-size: 0.95rem;
+  color: var(--farve-lys-graa);
+  margin-bottom: 32px;
+}
 
-    .portefølje-underoverskrift {
-      font-family: var(--skrift-serif);
-      font-size: 1.5rem;
-      font-weight: normal;
-      color: var(--farve-hvid);
-      margin-bottom: 20px;
-    }
+.portefølje-divider {
+  border: none;
+  border-top: 1px solid var(--farve-accent);
+  width: 100%;
+}
 
-    .kort-knap-primary {
-      width: 100%;
-      background-color: var(--farve-accent);
-      color: var(--farve-hvid);
-      font-family: var(--skrift-serif);
-      font-size: 0.85rem;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
+.portefølje-sub-sektion {
+  margin-bottom: 64px;
+}
 
-    .kort-knap-primary:hover {
-      background-color: var(--farve-accent-hover);
-    }
+.portefølje-underoverskrift {
+  font-family: var(--skrift-serif);
+  font-size: 1.5rem;
+  font-weight: normal;
+  color: var(--farve-hvid);
+  margin-bottom: 20px;
+}
 
-    .kort-knapper-række {
-      display: flex;
-      gap: 8px;
-    }
+.kort-knap-primary {
+  width: 100%;
+  background-color: var(--farve-accent);
+  color: var(--farve-hvid);
+  font-family: var(--skrift-serif);
+  font-size: 0.85rem;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
-    .kort-knap-opdater {
-      flex: 1;
-      background-color: #6b6b6b;
-      color: var(--farve-hvid);
-      font-family: var(--skrift-serif);
-      font-size: 0.85rem;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-    }
+.kort-knap-primary:hover {
+  background-color: var(--farve-accent-hover);
+}
 
-    .kort-knap-slet {
-      flex: 1;
-      background-color: #8b1a1a;
-      color: var(--farve-hvid);
-      font-family: var(--skrift-serif);
-      font-size: 0.85rem;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-    }
+.kort-knapper-række {
+  display: flex;
+  gap: 8px;
+}
+
+.kort-knap-opdater {
+  flex: 1;
+  background-color: #6b6b6b;
+  color: var(--farve-hvid);
+  font-family: var(--skrift-serif);
+  font-size: 0.85rem;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.kort-knap-slet {
+  flex: 1;
+  background-color: #8b1a1a;
+  color: var(--farve-hvid);
+  font-family: var(--skrift-serif);
+  font-size: 0.85rem;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
 
 /* ----------------------------------------------------------------- */
 /* Styling til bruger.html */
@@ -848,7 +839,8 @@ select.modal-input,
 }
 
 /* ----------------------------------------------------------------- */
-/* simuler case siden */
+/* Simuler case siden */
+
 .simuler-kontrol-række {
   display: flex;
   gap: 16px;
@@ -903,4 +895,123 @@ select.modal-input,
   font-family: var(--skrift-serif);
   margin-top: 4px;
   display: block;
+}
+
+/* ----------------------------------------------------------------- */
+/* Simuleringsresultater */
+
+.simuler-resultater {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.simuler-grafer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* definerer at et CSS grid-layout skal have tre kolonner af lige stor bredde */
+  gap: 24px;
+}
+
+.sammenlign-grafer-bundræk {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 66%;
+  margin: 24px auto 0;
+}
+
+.simuler-graf-kort {
+  background-color: #ffffff;
+  padding: 24px;
+  border: 1px solid #dddddd;
+}
+
+.simuler-graf-kort canvas {
+  max-height: 500px;
+}
+
+.simuler-graf-kort h3 {
+  font-family: var(--skrift-serif);
+  font-size: 1rem;
+  color: var(--farve-tekst-moerk);
+  margin-bottom: 16px;
+  font-weight: bold;
+}
+
+.simuler-noegletal {
+  margin-top: 24px;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+}
+
+.noegletal-tabel {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.noegletal-tabel tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.noegletal-tabel tr:last-child {
+  border-bottom: none;
+}
+
+.noegletal-tabel td {
+  padding: 16px 24px;
+  font-family: var(--skrift-serif);
+}
+
+.noegletal-label {
+  color: var(--farve-tekst-graa);
+  font-size: 0.85rem;
+  width: 50%;
+}
+
+.noegletal-vaerdi {
+  color: var(--farve-tekst-moerk);
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: right;
+  width: 50%;
+}
+
+#info-ep-indhold,
+#info-ic-indhold {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+#opdater-ic-indhold .modal-felt {
+  margin-bottom: 20px;
+}
+
+#opdater-ic-indhold .modal-felt:last-child {
+  margin-bottom: 0;
+}
+
+select[multiple].simuler-dropdown {
+  height: auto;
+  padding: 8px 16px;
+}
+
+.sammenlign-kontrol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.sammenlign-kontrol-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sammenlign-hjælp {
+  color: #ffffff !important;
 }

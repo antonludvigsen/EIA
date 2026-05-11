@@ -1,5 +1,5 @@
 
-require('dotenv').config(); /* vi starter med at kalde .env filen så brugernavne og adgangskoder kan indlæses */
+require('dotenv').config();
 
 /* BBR returnerer ejendomstype som en numerisk kode, vi oversætter til beskrivelse (kilde: https://teknik.bbr.dk/kodelister/0/1/0/BygAnvendelse) */
 const ejendomsTypeKoder = {
@@ -117,16 +117,8 @@ class BBR_API {
         const brugernavn = process.env.BBR_BRUGERNAVN;
         const password = process.env.BBR_PASSWORD;
 
-        /* Vi bruger forskellige endpoint kald, da dette er nødsaget for at få fat i antal værelser og grundarealet */
+        /* /bygning giver ejendomstype og byggeår; /enhed og /matrikel bruges til boligareal, antal værelser og grundareal */
         const bygningURL = `https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=${adgangsAdresseId}&username=${brugernavn}&password=${password}&format=JSON`;
-
-        /* Opbygning af BBR kald: "https://services.datafordeler.dk/BBR/BBRPublic/1/REST/" er det plain kald, herfra bygges der ovenpå
-        1:      "bygning" endpoint til BBR's bygning-metode
-        2:      "?" markerer starten på filtre vi sender med i kaldet
-        3:      "husnummer=${adresseId}" er adressens dawakode fx. "0a3f507b-4e55-32b8-e044-0003ba298018"
-        4:      "&username=${brugernavn}" sender brugernavnet fra .env
-        5:      "&password=${password}" sender passwordet fra .env
-        6:      "&format=JSON" fortæller BBR at vi vil have svaret i JSON-format */
 
         const bygningSvar = await fetch(bygningURL);
 
@@ -136,31 +128,30 @@ class BBR_API {
 
         const data = await bygningSvar.json();
 
-        /* BBR returnerer et array af bygninger, vi tager den første */
         if (!data || data.length === 0) {
             throw new Error('Ingen BBR-data fundet for denne adresse');
         }
 
-        const bygning = data[0]; /* Udtrækker de relevante felter fra API'ets response vi skal bruge til ejendomsprofilen */
-        const ejendomsTypeKode = String(bygning.byg021BygningensAnvendelse); /* konverterer BBR's numeriske kode til string så den matcher nøglerne i kodelisten */
+        /* Vælg den bygning med boligareal; fallback til første */
+        const bygning = data.find(b => b.byg039BygningensSamledeBoligAreal > 0) || data[0];
 
-        /* EJENDOMSTYPE */
+        /* BBR's kode er numerisk — konverter til string for opslag i kodelisten */
+        const ejendomsTypeKode = String(bygning.byg021BygningensAnvendelse);
+
         let ejendomstype;
         if (ejendomsTypeKoder[ejendomsTypeKode]) {
-            ejendomstype = ejendomsTypeKoder[ejendomsTypeKode]; /* slår koden op i kodelisten. Hvis koden ikke kendes, vises "Ukendt type" efterfulgt af koden */
+            ejendomstype = ejendomsTypeKoder[ejendomsTypeKode];
         } else {
             ejendomstype = `Ukendt type (${ejendomsTypeKode})`;
         }
 
-        /* BYGGEÅR */
-        let byggeår = bygning.byg026Opførelsesår || null;
+        let byggeår = bygning.byg026Opførelsesår;
 
-        /* GRUNDAREAL */
         let grundareal = null;
         try {
-            let jordstykke = bygning.jordstykke; /* Hvis bygning.jordstykke er en URL eller en lang streng, skal vi kun bruge den sidste del (selve ID'et).*/
+            let jordstykke = bygning.jordstykke;
 
-            /* Vi udtrækker ID'et (sidste del efter sidste skråstreg eller bare selve værdien) */
+            /* jordstykke kan være en URL — vi bruger kun den sidste del (selve ID'et) */
             const jordstykkeId = String(jordstykke).split('/').pop();
             const matrikelURL = `https://services.datafordeler.dk/Matriklen2/Matrikel/1.0.0/rest/SamletFastEjendom?JordstykkeId=${jordstykkeId}&username=${brugernavn}&password=${password}&format=JSON`;
             const matrikelSvar = await fetch(matrikelURL);
@@ -181,7 +172,7 @@ class BBR_API {
             grundareal = null;
         }
 
-        /* ANTAL VÆRELSER & BOLIGAREAL - Vi går her ind og henter det specifikke antal af værelser samt boligareal af lejligheder fra BBR i /enhed */
+        /* /enhed bruges til boligareal og antal værelser — lejligheder gemmer areal her, huse i /bygning */
         let antalVærelser = null;
         let boligareal = null;
         try {
@@ -192,27 +183,31 @@ class BBR_API {
             if (enhedSvar.ok) {
                 const enhedData = await enhedSvar.json();
                 if (enhedData && enhedData.length > 0) {
-                    const enhed = enhedData[0];
+                    const enhed = enhedData.find(e => e.enh026EnhedensSamledeAreal) || enhedData[0];
+
                     antalVærelser = enhed.enh031AntalVærelser || null;
-                    boligareal = enhed.enh026EnhedensSamledeAreal || null;
+
+                    if (enhed.enh026EnhedensSamledeAreal) {
+                        boligareal = enhed.enh026EnhedensSamledeAreal;
+                    } else if (bygning.byg039BygningensSamledeBoligAreal) {
+                        boligareal = bygning.byg039BygningensSamledeBoligAreal;
+                    }
                 }
             }
-
         } catch (enhedFejl) {
-            console.error("Fejl i enheds-search:", matrikelFejl);
+            console.error("Fejl i enheds-search:", enhedFejl);
             antalVærelser = null;
         }
 
-        const senestHentet = new Date().toISOString(); /* new Date() opretter et JavaScript Date-objekt med det aktuelle tidspunkt og konvertere det (fx 2026-04-29T13:22:00.000Z). Det er det format databasen forventer i DATETIME-kolonnen senestHentet. */
-
+        /* BBR's interne kodenavne oversættes til læsbare navne fra DCD'et */
         return {
             ejendomstype: ejendomstype,
             byggeår: byggeår,
             boligareal: boligareal,
             antalVærelser: antalVærelser,
             grundareal: grundareal,
-            senestHentet: senestHentet
-        }; /* BBR's feltnavne: "byg021BygningensAnvendelse" og "byg026Opførelsesår" er interne BBR-koder der er svære at læse og arbejde med i resten af koden. Vi oversætter dem til vores egne navne fra DCD'et. */
+            senestHentet: new Date().toISOString()
+        };
     };
 };
 

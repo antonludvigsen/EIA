@@ -7,7 +7,7 @@
 ## "byg040BygningensSamledeErhvervsAreal": 60 (Boligareal)
 ## "byg039BygningensSamledeBoligAreal": 640 (Grundareal)
 
-GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=0a3f507a-4503-32b8-e044-0003ba298018&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
+GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/bygning?husnummer=0a3f507a-7e58-32b8-e044-0003ba298018&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
 
 ##Output:
 

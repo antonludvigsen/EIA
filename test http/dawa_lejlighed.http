@@ -1,6 +1,6 @@
 
 # Birkegade 3, 2200 København N: (søgningKodet)
-GET https://api.dataforsyningen.dk/autocomplete?q=Birkegade%203%2C%20st%20th%2C%202200%20K%C3%B8benhavn%20N&type=adresse
+GET https://api.dataforsyningen.dk/autocomplete?q=Gr%C3%B8nnegade%2041%2C%203%2C%201107%20K%C3%B8benhavn%20K&type=adresse
 
 [
   {

@@ -1,4 +1,9 @@
-/* ejendomsprofil.js håndterer al UI logik for ejendomsprofilsiden. den læser adresseId fra URL'en, kalder /api/ejendomsprofil/vis og indsætter data dynamisk i HTML'en. */
+/* ejendomsprofil.js håndterer al UI-logik for ejendomsprofilsiden. 
+    1. Siden åbnes med ?adresseId=... i URL'en (sat af adresse.js)
+    2. henter ejendomsdata fra /api/ejendomsprofil/vis
+    3. indsætter resultatet dynamisk i HTML'en.
+
+Klassen EjendomsprofilUI gemmer dawaData og bbrData på instansen fra hentOgVisEjendomsdata() så gemEjendomsprofil() kan sende dem videre til serveren uden et ekstra API-kald. */
 
 class EjendomsprofilUI {
 
@@ -97,10 +102,7 @@ class EjendomsprofilUI {
         }
     }
 
-    /* sender den aktuelle ejendomsprofil til serveren som et POST-kald med beskrivelse, adresse og
-       ejendomsdata. Profilnavnet afledes på serversiden fra adresseobjektet — vi sender det ikke herfra.
-       this.dawaData og this.bbrData er gemt på instansen af hentOgVisEjendomsdata() og indeholder
-       det rå svar fra DAWA- og BBR-API'erne. */
+    /* sender den aktuelle ejendomsprofil til serveren som et POST-kald med beskrivelse, adresse og ejendomsdata. Profilnavnet gemmes som adressenavenet. */
     async gemEjendomsprofil() {
         try {
             const beskrivelse = document.getElementById('profil-beskrivelse').value;
@@ -110,7 +112,14 @@ class EjendomsprofilUI {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     beskrivelse,
-                    adresse: this.dawaData,
+                    adresse: {
+                        vejnavn:    this.dawaData.vejnavn,
+                        husnummer:  this.dawaData.husnummer,
+                        etage:      this.dawaData.etage || null,
+                        doer:       this.dawaData.dør   || null,
+                        postnummer: this.dawaData.postnummer,
+                        bynavn:     this.dawaData.bynavn
+                    },
                     ejendomsdata: this.bbrData
                 })
             });
@@ -128,9 +137,9 @@ class EjendomsprofilUI {
         }
     }
 
+    /* initialiser() tilknytter event-lyttere og starter den initiale datahentning. Den er adskilt fra konstruktøren fordi den tilgår DOM-elementer der kan mangle i unit-test-miljøer. konstruktøren kan dermed testes isoleret. */
     initialiser() {
-        /* og vi kalder selvfølgelig funktionen med det samme når siden indlæses */
-        this.hentOgVisEjendomsdata();
+        this.hentOgVisEjendomsdata(); /* og vi kalder selvfølgelig funktionen med det samme når siden indlæses */
 
         /* åbn modalen når brugeren trykker gem-knappen */
         this.gemKnap.addEventListener('click', () => {
@@ -149,6 +158,6 @@ class EjendomsprofilUI {
     }
 }
 
-/* instantiér og initialisér når siden indlæses */
+/* initialiser når siden indlæses */
 const ejendomsprofilUI = new EjendomsprofilUI();
 ejendomsprofilUI.initialiser();

@@ -1,7 +1,6 @@
-/* portefølje.js håndterer al UI-logik for porteføljesiden. Den henter og viser gemte ejendomsprofiler
-   og investeringscases, styrer opdaterings- og sletningsflows, og indeholder den femtrinsmodale
-   formular til oprettelse af nye investeringscases. Al kommunikation med serveren sker via fetch-kald
-   til /api/ejendomsprofil/... og /api/investeringscase/... */
+/* portefølje.js håndterer al UI-logik for porteføljesiden samt den femtrinsmodale formular til oprettelse af nye investeringscases.
+Den henter og viser gemte ejendomsprofiler og investeringscases, styrer oprettelses-, opdaterings-, infovisnings-, duplikerings og sletningsflows. 
+Al kommunikation med serveren sker via fetch-kald til /api/ejendomsprofil/... og /api/investeringscase/... */
 
 class Portefolje {
     constructor() {
@@ -15,15 +14,14 @@ class Portefolje {
         this.formData = {}; /* akkumulerer brugerdata på tværs af de fem trin i investeringscase-modalen */
         window.portefolje = this; /* eksponeres globalt så inline onclick-attributter i HTML-skabelonerne kan kalde klassens metoder */
         this.tilknytModalLyttere();
-        this.hentOgVisPortefolje();
-        this.hentOgVisInvesteringscases();
+        this.hentOgVisEPer();
+        this.hentOgVisICs();
     }
 
-    /* knytter alle klik-lyttere til modal-knapperne. Samles her frem for i konstruktøren
-       for at holde initialiseringslogikken overskuelig. */
+    /* knytter alle klik-lyttere til modal-knapperne. Samles her frem for i konstruktøren for at holde initialiseringslogikken overskuelig. */
     tilknytModalLyttere() {
-        document.getElementById('opdater-modal-annuller').addEventListener('click', () => this.lukOpdaterModal());
-        document.getElementById('opdater-modal-gem').addEventListener('click', () => this.gemOpdatering());
+        document.getElementById('opdater-modal-annuller').addEventListener('click', () => this.lukOpdaterEP());
+        document.getElementById('opdater-modal-gem').addEventListener('click', () => this.gemOpdateringEP());
         document.getElementById('investering-modal-annuller').addEventListener('click', () => this.lukInvesteringModal());
         document.getElementById('investering-modal-naeste').addEventListener('click', () => this.næsteStep1());
         document.getElementById('inv-step2-tilbage').addEventListener('click', () => this.tilbageStep2());
@@ -33,133 +31,57 @@ class Portefolje {
         document.getElementById('inv-tilfoej-renovering').addEventListener('click', () => this.tilfoejRenoveringRække());
         document.getElementById('inv-step4-tilbage').addEventListener('click', () => this.tilbageStep4());
         document.getElementById('inv-step4-naeste').addEventListener('click', () => this.næsteStep4());
-        document.getElementById('inv-tilfoej-drift').addEventListener('click', () => this.tilfoejDriftRække());
         document.getElementById('inv-step5-tilbage').addEventListener('click', () => this.tilbageStep5());
-        document.getElementById('inv-step5-opret').addEventListener('click', () => this.opretInvesteringscase());
-        document.getElementById('opdater-ic-modal-annuller').addEventListener('click', () => this.lukOpdaterICModal());
+        document.getElementById('inv-step5-opret').addEventListener('click', () => this.opretIC());
+        document.getElementById('opdater-ic-modal-annuller').addEventListener('click', () => this.lukOpdaterIC());
         document.getElementById('opdater-ic-modal-gem').addEventListener('click', () => this.gemOpdateringIC());
+
+        document.getElementById('info-ep-luk').addEventListener('click', () => {
+            document.getElementById('info-ep-modal-overlay').classList.remove('aktiv');
+        });
+        document.getElementById('info-ic-luk').addEventListener('click', () => {
+            document.getElementById('info-ic-modal-overlay').classList.remove('aktiv');
+        });
     }
 
-    /* åbner opdateringsmodalen for en ejendomsprofil og forududfylder beskrivelsesfeltet.
-       id gemmes på modal-elementets dataset så gemOpdatering() kan hente det ved klik på gem-knappen. */
-    åbnOpdaterModal(id, beskrivelse) {
-        this.opdaterModal.dataset.id = id;
-        this.opdaterBeskrivelse.value = beskrivelse;
-        this.opdaterModal.classList.add('aktiv');
-    }
+    /* ---------------------------------------------------------------------------------- */
+    /* PORTEFØLJEVISNING (EJENDOMSPROFILER) */
 
-    lukOpdaterModal() {
-        this.opdaterModal.classList.remove('aktiv');
-    }
-
-    /* sender en PUT-anmodning med den opdaterede beskrivelse til serveren og genindlæser siden
-       for at afspejle ændringen i porteføljekortet. */
-    async gemOpdatering() {
-        const ejendomsprofilID = this.opdaterModal.dataset.id;
-        const beskrivelse = this.opdaterBeskrivelse.value.trim();
-
-        try {
-            const svar = await fetch('/api/ejendomsprofil/opdater', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ejendomsprofilID, beskrivelse })
-            });
-            if (!svar.ok) throw new Error('Serverfejl');
-            this.lukOpdaterModal();
-            location.reload();
-        } catch (fejl) {
-            console.error('Kunne ikke opdatere ejendomsprofil:', fejl);
-            alert('Der opstod en fejl. Prøv igen.');
-        }
-    }
-
-    /* åbner opdateringsmodalen for en investeringscase og forududfylder navn og beskrivelse. */
-    åbnOpdaterICModal(id, navn, beskrivelse) {
-        this.opdaterICModal.dataset.id = id;
-        this.opdaterICNavn.value = navn;
-        this.opdaterICBeskrivelse.value = beskrivelse;
-        this.opdaterICModal.classList.add('aktiv');
-    }
-
-    lukOpdaterICModal() {
-        this.opdaterICModal.classList.remove('aktiv');
-    }
-
-    /* sender en PUT-anmodning med opdateret navn og beskrivelse for en investeringscase.
-       Opdaterer herefter listen uden en fuld sidereload, da investeringscases opdateres hyppigere. */
-    async gemOpdateringIC() {
-        const investeringscaseID = this.opdaterICModal.dataset.id;
-        const navn = this.opdaterICNavn.value.trim();
-        const beskrivelse = this.opdaterICBeskrivelse.value.trim();
-
-        if (!navn) {
-            this.opdaterICNavn.focus();
-            return;
-        }
-
-        try {
-            const svar = await fetch('/api/investeringscase/opdater', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ investeringscaseID, navn, beskrivelse })
-            });
-            if (!svar.ok) throw new Error('Serverfejl');
-            this.lukOpdaterICModal();
-            await this.hentOgVisInvesteringscases();
-        } catch (fejl) {
-            console.error('Kunne ikke opdatere investeringscase:', fejl);
-            alert('Der opstod en fejl. Prøv igen.');
-        }
-    }
-
-    /* beder brugeren bekræfte inden sletning, da handlingen ikke kan fortrydes.
-       Genindlæser siden så det slettede kort forsvinder fra porteføljegriddet. */
-    async sletEjendomsprofil(id) {
-        if (!confirm('Er du sikker på, at du vil slette denne ejendomsprofil? Dette kan ikke fortrydes.')) return;
-        try {
-            const svar = await fetch(`/api/ejendomsprofil/slet/${id}`, { method: 'DELETE' });
-            if (!svar.ok) throw new Error('Serverfejl');
-            location.reload();
-        } catch (fejl) {
-            console.error('Kunne ikke slette ejendomsprofil:', fejl);
-            alert('Der opstod en fejl. Prøv igen.');
-        }
-    }
-
-    /* henter alle gemte ejendomsprofiler fra serveren og sender dem til visProfiler().
-       Fejl ignoreres stille — gridet forbliver tomt frem for at vise en fejlbesked. */
-    async hentOgVisPortefolje() {
+    /* henter alle gemte ejendomsprofiler fra serveren og sender dem til visEPer(). */
+    async hentOgVisEPer() {
         try {
             const svar = await fetch('/api/ejendomsprofil/portefolje');
             if (!svar.ok) throw new Error('Serverfejl');
             const profiler = await svar.json();
-            this.visProfiler(profiler);
+            this.profiler = profiler;
+            this.visEPer(profiler);
         } catch (fejl) {
-            // fejl ignoreres stille – grid forbliver tomt
+            /* fejl ignoreres stille og grid forbliver tomt */
         }
     }
 
-    /* genererer HTML-kort for alle profiler og indsætter dem i porteføljeGriddet. */
-    visProfiler(profiler) {
-        this.grid.innerHTML = profiler.map(profil => this.byggKort(profil)).join('');
+    /* genererer HTML-kort for alle profiler og indsætter dem i portefølje-griddet. */
+    visEPer(profiler) {
+        this.grid.innerHTML = profiler.map(profil => this.bygKortEP(profil)).join('');
     }
 
-    /* henter alle investeringscases og sender dem til visInvesteringscases(). */
-    async hentOgVisInvesteringscases() {
+    /* PORTEFØLJEVISNING (INVESTERINGSCASES) */
+
+    /* henter alle investeringscases og sender dem til visICs(). */
+    async hentOgVisICs() {
         try {
             const svar = await fetch('/api/investeringscase/hentAlle');
             if (!svar.ok) throw new Error('Serverfejl');
             const cases = await svar.json();
-            this.visInvesteringscases(cases);
+            this.cases = cases;
+            this.visICs(cases);
         } catch (fejl) {
-            // fejl ignoreres stille – grid forbliver tomt
+            /* fejl ignoreres stille og grid forbliver tomt */
         }
     }
-
-    /* bygger HTML-kort for alle investeringscases og indsætter dem i investeringscase-gridet.
-       data-id, data-navn og data-beskrivelse bruges til at videregive ID og tekst til onclick-handleren,
-       da inline HTML-attributter ikke kan tilgå lokale JavaScript-variabler direkte. */
-    visInvesteringscases(cases) {
+    
+    /* bygger HTML-kort for alle cases og indsætter dem i investeringscase-gridet. */
+    visICs(cases) {
         const grid = document.getElementById('investeringscase-grid');
         if (!grid) return;
         grid.innerHTML = cases.map(ic => {
@@ -167,83 +89,49 @@ class Portefolje {
                 day: '2-digit', month: 'long', year: 'numeric'
             });
             const beskrivelse = ic.beskrivelse
-                ? `<p class="portefølje-kort-beskrivelse">${this.undgåHTML(ic.beskrivelse)}</p>`
-                : '';
-            const id = ic.investeringscaseID;
+            ? `<p class="portefølje-kort-beskrivelse">${this.undgåHTML(ic.beskrivelse)}</p>`
+            : '';
+            const id = ic.investeringscaseID; /* data-id, data-navn og data-beskrivelse bruges til at videregive ID og tekst til onclick-handleren, da inline HTML-attributter ikke kan tilgå lokale JavaScript-variabler direkte. */
             return `
-              <div class="portefølje-kort">
-                <button class="kort-dupliker-knap"
-                  data-id="${id}"
-                  onclick="window.portefolje.duplikerInvesteringscase(this.dataset.id)"
-                  title="Duplikér investeringscase">⧉</button>
-                <h2 class="portefølje-kort-navn">${this.undgåHTML(ic.navn)}</h2>
-                <p class="portefølje-kort-adresse">${this.undgåHTML(ic.ejendomsprofilNavn)}</p>
-                ${beskrivelse}
-                <span class="portefølje-kort-dato">Oprettet ${dato}</span>
-                <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.simulerCase(this.dataset.id)">Simuler case</button>
-                <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.sammenlignCase(this.dataset.id)">Sammenlign cases</button>
-                <div class="kort-knapper-række">
-                  <button class="kort-knap-opdater"
-                    data-id="${id}"
-                    data-navn="${this.undgåHTML(ic.navn)}"
-                    data-beskrivelse="${this.undgåHTML(ic.beskrivelse || '')}"
-                    onclick="window.portefolje.åbnOpdaterICModal(this.dataset.id, this.dataset.navn, this.dataset.beskrivelse)">Opdater</button>
-                  <button class="kort-knap-slet" data-id="${id}" onclick="window.portefolje.sletInvesteringscase(this.dataset.id)">Slet</button>
-                </div>
-              </div>`;
+            <div class="portefølje-kort">
+            <div class="kort-header">
+            <div>
+            <h2 class="portefølje-kort-navn">${this.undgåHTML(ic.navn)}</h2>
+            ${beskrivelse}
+            </div>
+            <div class="kort-header-knapper">
+            <button class="kort-info-knap"
+            data-id="${id}"
+            onclick="window.portefolje.visICInfo(this.dataset.id)"
+            title="Se investeringscaseoplysninger">ℹ</button>
+            <button class="kort-dupliker-knap"
+            data-id="${id}"
+            onclick="window.portefolje.duplikerIC(this.dataset.id)"
+            title="Duplikér investeringscase">⧉</button>
+            </div>
+            </div>
+            <hr class="kort-divider">
+            <p class="portefølje-kort-adresse">${this.undgåHTML(ic.ejendomsprofilNavn)}</p>
+            <span class="portefølje-kort-dato">Oprettet ${dato}</span>
+            <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.simulerCase(this.dataset.id)">Simuler case</button>
+            <button class="kort-knap-primary" data-id="${id}" onclick="window.portefolje.sammenlignCase(this.dataset.id)">Sammenlign cases</button>
+            <div class="kort-knapper-række">
+            <button class="kort-knap-opdater"
+            onclick="window.portefolje.åbnOpdaterIC('${id}', '${this.undgåHTML(ic.navn)}', '${this.undgåHTML(ic.beskrivelse || '')}', window.portefolje.cases.find(c => String(c.investeringscaseID) === '${id}'))">Opdater</button>
+            <button class="kort-knap-slet" data-id="${id}" onclick="window.portefolje.sletInvesteringscase(this.dataset.id)">Slet</button>
+            </div>
+            </div>`;
         }).join('');
     }
+    
+    /* ---------------------------------------------------------------------------------- */
+    /* KORTOPBYGNING (EJENDOMSPROFIL) */
 
-    /* beder brugeren bekræfte inden sletning og opdaterer derefter listen uden fuld sidereload. */
-    async sletInvesteringscase(id) {
-        if (!confirm('Er du sikker på, at du vil slette denne investeringscase? Dette kan ikke fortrydes.')) return;
-        try {
-            const svar = await fetch(`/api/investeringscase/slet/${id}`, { method: 'DELETE' });
-            if (!svar.ok) throw new Error('Serverfejl');
-            await this.hentOgVisInvesteringscases();
-        } catch (fejl) {
-            console.error('Kunne ikke slette investeringscase:', fejl);
-            alert('Der opstod en fejl. Prøv igen.');
-        }
-    }
-
-    async duplikerEjendomsprofil(id) {
-        if (!confirm('Du har trykket på dupliker. Vil du fortsætte?')) return;
-        try {
-            const svar = await fetch(`/api/ejendomsprofil/dupliker/${id}`, { method: 'POST' });
-            if (!svar.ok) throw new Error('Serverfejl');
-            location.reload();
-        } catch (fejl) {
-            console.error('Kunne ikke duplikere ejendomsprofil:', fejl);
-            alert('Der opstod en fejl. Prøv igen.');
-        }
-    }
-
-    async duplikerInvesteringscase(id) {
-        if (!confirm('Du har trykket på dupliker. Vil du fortsætte?')) return;
-        try {
-            const svar = await fetch(`/api/investeringscase/dupliker/${id}`, { method: 'POST' });
-            if (!svar.ok) throw new Error('Serverfejl');
-            location.reload();
-        } catch (fejl) {
-            console.error('Kunne ikke duplikere investeringscase:', fejl);
-            alert('Der opstod en fejl. Prøv igen.');
-        }
-    }
-
-    simulerCase(investeringscaseID) {
-        window.location.href = `/simuler_case.html?id=${investeringscaseID}`;
-    }
-
-    sammenlignCase(investeringscaseID) {
-        window.location.href = `/sammenlign_cases.html?id=${investeringscaseID}`;
-    }
-
-    /* bygger HTML-strengen for ét ejendomsprofilkort. Adressefelterne fra databasen samles til
-       én læsbar adressestreng. data-beskrivelse bruges til at videregive beskrivelsen til
-       opdateringsmodalen via onclick-attributten uden at indlejre den som en JS-variabel. */
-    byggKort(profil) {
-        const adresse = `${profil.vejnavn} ${profil.husnummer}, ${profil.postnummer} ${profil.bynavn}`;
+    /* bygger HTML-strengen for et ejendomsprofilkort. Adressefelterne fra databasen samles til en læsbar adressestreng. data-beskrivelse bruges til at videregive beskrivelsen til opdateringsmodalen via onclick-attributten uden at indlejre den som en JS-variabel. */
+    bygKortEP(profil) {
+        const etage = profil.etage ? `, ${profil.etage}` : '';
+        const doer = profil.doer ? `. ${profil.doer}` : '';
+        const adresse = `${profil.vejnavn} ${profil.husnummer}${etage}${doer}, ${profil.postnummer} ${profil.bynavn}`;
         const dato = new Date(profil.oprettetDato).toLocaleDateString('da-DK', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
@@ -254,12 +142,23 @@ class Portefolje {
 
         return `
           <div class="portefølje-kort">
-            <button class="kort-dupliker-knap"
-              data-id="${id}"
-              onclick="window.portefolje.duplikerEjendomsprofil(this.dataset.id)"
-              title="Duplikér ejendomsprofil">⧉</button>
-            <h2 class="portefølje-kort-navn">${this.undgåHTML(profil.navn)}</h2>
-            ${beskrivelse}
+            <div class="kort-header">
+              <div>
+                <h2 class="portefølje-kort-navn">${this.undgåHTML(profil.navn)}</h2>
+                ${beskrivelse}
+              </div>
+              <div class="kort-header-knapper">
+                <button class="kort-info-knap"
+                  data-id="${id}"
+                  onclick="window.portefolje.visEPInfo(this.dataset.id)"
+                  title="Se ejendomsprofiloplysninger">ℹ</button>
+                <button class="kort-dupliker-knap"
+                  data-id="${id}"
+                  onclick="window.portefolje.duplikerEP(this.dataset.id)"
+                  title="Duplikér ejendomsprofil">⧉</button>
+              </div>
+            </div>
+            <hr class="kort-divider">
             <p class="portefølje-kort-cases">
               ${profil.antalCases === 1
                 ? '1 investeringscase tilknyttet'
@@ -271,18 +170,20 @@ class Portefolje {
               <button class="kort-knap-opdater"
                 data-id="${id}"
                 data-beskrivelse="${this.undgåHTML(profil.beskrivelse || '')}"
-                onclick="window.portefolje.åbnOpdaterModal(this.dataset.id, this.dataset.beskrivelse)">Opdater</button>
-              <button class="kort-knap-slet" data-id="${id}" onclick="window.portefolje.sletEjendomsprofil(this.dataset.id)">Slet</button>
+                onclick="window.portefolje.åbnOpdaterEP(this.dataset.id, this.dataset.beskrivelse)">Opdater</button>
+              <button class="kort-knap-slet" data-id="${id}" onclick="window.portefolje.sletEP(this.dataset.id)">Slet</button>
             </div>
           </div>`;
     }
 
-    /* viser en fejlbesked under et inputfelt ved at farve kanten rød og indsætte et span-element.
-       Opretter kun et nyt span-element hvis der ikke allerede findes et — forhindrer duplikerede fejlbeskeder. */
+    /* ---------------------------------------------------------------------------------- */
+    /* FRONTEND (UI) FEJLHÅNDTERINGSVISNING */
+
+    /* viser en fejlbesked under et inputfelt ved at farve kanten rød og indsætte et span-element */
     visModalFejl(inputElement, besked) {
         inputElement.style.border = '1px solid #c0392b';
         let fejlSpan = inputElement.parentElement.querySelector('.modal-fejl');
-        if (!fejlSpan) {
+        if (!fejlSpan) { /* Opretter kun et nyt span-element hvis der ikke allerede findes et, forhindrer duplikerede fejlbeskeder. */
             fejlSpan = document.createElement('span');
             fejlSpan.className = 'modal-fejl';
             inputElement.insertAdjacentElement('afterend', fejlSpan);
@@ -290,56 +191,41 @@ class Portefolje {
         fejlSpan.textContent = besked;
     }
 
-    /* fjerner fejlmarkering fra et inputfelt — kaldes både ved navigation til næste trin
-       og når feltets indhold valideres korrekt. */
+    /* fjerner fejlmarkering fra et inputfelt, kaldes både ved navigation til næste trin og når feltets indhold valideres korrekt. */
     fjernModalFejl(inputElement) {
         inputElement.style.border = '';
         const fejlSpan = inputElement.parentElement.querySelector('.modal-fejl');
         if (fejlSpan) fejlSpan.remove();
     }
 
-    /* forhindrer brugeren i at skrive bogstaver og specialtegn i numeriske inputfelter.
-       Komma og punktum er begge tilladt, da danske decimaltal kan skrives med komma,
-       mens browseren selv sender tallet med punktum til JavaScript.
-       dataset.blokerAttached bruges som en vagt der forhindrer at samme keydown-lytter
-       tilknyttes flere gange, hvis modalen åbnes og lukkes gentagne gange. */
-    blokerIkkeNumeriskInput(inputElement) {
-        if (inputElement.dataset.blokerAttached) return;
-        inputElement.dataset.blokerAttached = 'true';
-        const tilladte = new Set(['0','1','2','3','4','5','6','7','8','9',
-            ',','.','Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End']);
-        inputElement.addEventListener('keydown', (e) => {
-            if (!tilladte.has(e.key)) e.preventDefault();
-        });
-    }
+    /* ---------------------------------------------------------------------------------- */
+    /* 5-SIDET FORMULAR OG OPRETTELSE AF INVESTERINGSCASE */
 
-    /* skifter det synlige trin i investeringscasemodalen ved at vise ét step og skjule alle andre. */
+    /* "bladre i bogen" logik. skifter det synlige trin i investeringscasemodalen ved at vise et step og skjule alle andre. */
     visStep(n) {
         [1, 2, 3, 4, 5].forEach(i => {
             document.getElementById(`inv-step-${i}`).style.display = i === n ? 'flex' : 'none';
         });
     }
 
-    /* åbner investeringscasemodalen og nulstiller alle felter og formData, så tidligere indtastninger
-       ikke genbruges hvis brugeren åbner modalen for en anden ejendomsprofil. */
+    /* Nulstiller alle felter og formData, så tidligere indtastninger ikke genbruges hvis brugeren åbner modalen for en anden ejendomsprofil. */
     åbnInvesteringModal(ejendomsprofilID) {
         this.investeringModal.dataset.id = ejendomsprofilID;
-        this.formData = {};
+        this.formData = {}; 
         const alleNumeriske = ['inv-ejendomspris', 'inv-advokatudgifter', 'inv-tinglysningsudgifter',
             'inv-overtagelsesudgifter', 'inv-koebsomkostninger',
             'inv-laanebeloeb', 'inv-rente', 'inv-loebetid', 'inv-afdragsfri',
-            'inv-renoveringstidspunkt'];
+            'inv-renoveringstidspunkt', 'inv-drift-beloeb'];
         alleNumeriske.forEach(id => {
             const el = document.getElementById(id);
             el.value = '';
             this.fjernModalFejl(el);
-            this.blokerIkkeNumeriskInput(el);
         });
         const laanetype = document.getElementById('inv-laanetype');
         laanetype.value = '';
         this.fjernModalFejl(laanetype);
         document.getElementById('inv-renovering-liste').innerHTML = '';
-        document.getElementById('inv-drift-liste').innerHTML = '';
+        document.getElementById('inv-drift-navn').value = '';
         document.getElementById('udlejning-toggle').checked = false;
         document.getElementById('inv-maanedlig-leje').value = '';
         document.getElementById('inv-udlejningsudgifter').value = '';
@@ -356,16 +242,17 @@ class Portefolje {
         this.investeringModal.classList.remove('aktiv');
     }
 
-    /* validerer trin 1 (købsdetaljer) og gemmer de godkendte værdier i this.formData.køb.
-       Ejendomspris er påkrævet. De øvrige felter er valgfrie, men valideres for gyldigt format
-       hvis de udfyldes. */
+    /* SIDE 1: KØBSDETALJER */
+
+    /* validerer trin 1 (købsdetaljer) og gemmer de godkendte værdier i this.formData.køb. 
+    Ejendomspris er påkrævet. De øvrige felter er valgfrie, men valideres for gyldigt format hvis de udfyldes. */
     næsteStep1() {
         const felter = {
-            ejendomspris:        document.getElementById('inv-ejendomspris'),
-            advokatudgifter:     document.getElementById('inv-advokatudgifter'),
-            tinglysningsudgifter:document.getElementById('inv-tinglysningsudgifter'),
-            overtagelsesudgifter:document.getElementById('inv-overtagelsesudgifter'),
-            koebsomkostninger:   document.getElementById('inv-koebsomkostninger'),
+            ejendomspris: document.getElementById('inv-ejendomspris'),
+            advokatudgifter: document.getElementById('inv-advokatudgifter'),
+            tinglysningsudgifter: document.getElementById('inv-tinglysningsudgifter'),
+            overtagelsesudgifter: document.getElementById('inv-overtagelsesudgifter'),
+            koebsomkostninger: document.getElementById('inv-koebsomkostninger'),
         };
 
         let gyldig = true;
@@ -393,41 +280,39 @@ class Portefolje {
 
         this.formData.køb = {
             ejendomspris,
-            advokatudgifter:      parseFloat(felter.advokatudgifter.value)      || 0,
+            advokatudgifter: parseFloat(felter.advokatudgifter.value) || 0,
             tinglysningsudgifter: parseFloat(felter.tinglysningsudgifter.value) || 0,
             overtagelsesudgifter: parseFloat(felter.overtagelsesudgifter.value) || 0,
-            koebsomkostninger:    parseFloat(felter.koebsomkostninger.value)    || 0,
+            koebsomkostninger: parseFloat(felter.koebsomkostninger.value) || 0,
         };
-        console.log('Step 1 complete', this.formData);
         this.visStep(2);
     }
 
-    /* gendanner de tidligere indtastede værdier i trin 1 når brugeren navigerer tilbage.
-       Bevarelse af data er vigtigt for brugeroplevelsen — tab af data ville gøre flowet ubrugeligt. */
+    /* gendanner de tidligere indtastede værdier i trin 1 når brugeren navigerer tilbage. Bevarelse af data er vigtigt for brugeroplevelsen, tab af data ville gøre flowet ubrugeligt. */
     tilbageStep2() {
         const k = this.formData.køb || {};
-        document.getElementById('inv-ejendomspris').value        = k.ejendomspris        || '';
-        document.getElementById('inv-advokatudgifter').value     = k.advokatudgifter     || '';
-        document.getElementById('inv-tinglysningsudgifter').value= k.tinglysningsudgifter|| '';
-        document.getElementById('inv-overtagelsesudgifter').value= k.overtagelsesudgifter|| '';
-        document.getElementById('inv-koebsomkostninger').value   = k.koebsomkostninger   || '';
+        document.getElementById('inv-ejendomspris').value = k.ejendomspris || '';
+        document.getElementById('inv-advokatudgifter').value = k.advokatudgifter || '';
+        document.getElementById('inv-tinglysningsudgifter').value = k.tinglysningsudgifter || '';
+        document.getElementById('inv-overtagelsesudgifter').value = k.overtagelsesudgifter || '';
+        document.getElementById('inv-koebsomkostninger').value = k.koebsomkostninger || '';
         ['inv-ejendomspris', 'inv-advokatudgifter', 'inv-tinglysningsudgifter',
-         'inv-overtagelsesudgifter', 'inv-koebsomkostninger'].forEach(id => {
-            this.fjernModalFejl(document.getElementById(id));
-        });
+            'inv-overtagelsesudgifter', 'inv-koebsomkostninger'].forEach(id => {
+                this.fjernModalFejl(document.getElementById(id));
+            });
         this.visStep(1);
     }
 
-    /* validerer trin 2 (lånedetaljer) og gemmer de godkendte værdier i this.formData.laan.
-       Alle felter er valgfrie, men valideres for gyldigt format og logisk sammenhæng
-       (afdragsfri periode skal være kortere end løbetiden). */
+    /* SIDE 2: LØNEDETALJER */
+
+    /* validerer trin 2 (lånedetaljer) og gemmer de godkendte værdier i this.formData.laan. Alle felter er valgfrie, men valideres for gyldigt format og logisk sammenhæng (afdragsfri periode skal være kortere end løbetiden). */
     næsteStep2() {
         const felter = {
-            laanebeloeb:      document.getElementById('inv-laanebeloeb'),
-            rente:            document.getElementById('inv-rente'),
-            loebetid:         document.getElementById('inv-loebetid'),
-            afdragsfriPeriode:document.getElementById('inv-afdragsfri'),
-            laanetype:        document.getElementById('inv-laanetype'),
+            laanebeloeb: document.getElementById('inv-laanebeloeb'),
+            rente: document.getElementById('inv-rente'),
+            loebetid: document.getElementById('inv-loebetid'),
+            afdragsfriPeriode: document.getElementById('inv-afdragsfri'),
+            laanetype: document.getElementById('inv-laanetype'),
         };
 
         let gyldig = true;
@@ -481,12 +366,26 @@ class Portefolje {
             afdragsfriPeriode,
             laanetype: felter.laanetype.value || null,
         };
-        console.log('Step 2 complete', this.formData);
         this.visStep(3);
     }
 
-    /* opretter en ny dynamisk række i renoveringslisten.
-       Hver række har et navnfelt, et beløbsfelt og en fjern-knap der sletter rækken fra DOM'en. */
+    /* SIDE 3: RENOVERING OG FORBEDRING */
+
+    /* gendanner trin 2-felterne og renoveringslistens rækker fra formData når brugeren navigerer tilbage. */
+    tilbageStep3() {
+        const l = this.formData.laan || {};
+        document.getElementById('inv-laanebeloeb').value = l.laanebeloeb ?? '';
+        document.getElementById('inv-rente').value = l.rente ?? '';
+        document.getElementById('inv-loebetid').value = l.loebetid ?? '';
+        document.getElementById('inv-afdragsfri').value = l.afdragsfriPeriode ?? '';
+        document.getElementById('inv-laanetype').value = l.laanetype ?? '';
+        ['inv-laanebeloeb', 'inv-rente', 'inv-loebetid', 'inv-afdragsfri', 'inv-laanetype'].forEach(id => {
+            this.fjernModalFejl(document.getElementById(id));
+        });
+        this.visStep(2);
+    }
+
+    /* opretter en ny dynamisk række i renoveringslisten. Hver række har et navnfelt, et beløbsfelt og en fjern-knap der sletter rækken fra DOM'en. */
     tilfoejRenoveringRække() {
         const liste = document.getElementById('inv-renovering-liste');
 
@@ -506,7 +405,6 @@ class Portefolje {
         beloebInput.step = '0.01';
         beloebInput.placeholder = 'fx. 250.000 kr.';
         beloebInput.style.cssText = 'flex:1; min-width:0;';
-        this.blokerIkkeNumeriskInput(beloebInput);
 
         const fjernKnap = document.createElement('button');
         fjernKnap.type = 'button';
@@ -520,22 +418,9 @@ class Portefolje {
         liste.appendChild(kort);
     }
 
-    /* gendanner trin 2-felterne og renoveringslistens rækker fra formData når brugeren navigerer tilbage. */
-    tilbageStep3() {
-        const l = this.formData.laan || {};
-        document.getElementById('inv-laanebeloeb').value  = l.laanebeloeb        ?? '';
-        document.getElementById('inv-rente').value        = l.rente              ?? '';
-        document.getElementById('inv-loebetid').value     = l.loebetid           ?? '';
-        document.getElementById('inv-afdragsfri').value   = l.afdragsfriPeriode  ?? '';
-        document.getElementById('inv-laanetype').value    = l.laanetype          ?? '';
-        ['inv-laanebeloeb', 'inv-rente', 'inv-loebetid', 'inv-afdragsfri', 'inv-laanetype'].forEach(id => {
-            this.fjernModalFejl(document.getElementById(id));
-        });
-        this.visStep(2);
-    }
+    /* SIDE 4: DRIFTSOMKOSTNINGER */
 
-    /* validerer trin 3 (renovering). Rækker med gyldigt beløb gemmes med beløbet; rækker med
-       kun et navn (uden beløb) gemmes med null. Rækker der er helt tomme ignoreres. */
+    /* validerer trin 3 (renovering). Rækker med gyldigt beløb gemmes; rækker med kun navn gemmes med null; tomme rækker ignoreres. */
     næsteStep3() {
         const tidspunktEl = document.getElementById('inv-renoveringstidspunkt');
         const rækker = document.getElementById('inv-renovering-liste').querySelectorAll('.renovering-kort');
@@ -549,8 +434,8 @@ class Portefolje {
             const inputs = række.querySelectorAll('input');
             const navnInput   = inputs[0];
             const beloebInput = inputs[1];
-            const harNavn     = navnInput.value.trim() !== '';
-            const harBeloeb   = beloebInput.value.trim() !== '';
+            const harNavn   = navnInput.value.trim() !== '';
+            const harBeloeb = beloebInput.value.trim() !== '';
 
             if (harBeloeb) {
                 const beloeb = parseFloat(beloebInput.value);
@@ -577,42 +462,7 @@ class Portefolje {
         if (!gyldig) return;
 
         this.formData.renovering = { poster, renoveringstidspunkt };
-        console.log('Step 3 complete', this.formData);
         this.visStep(4);
-    }
-
-    /* opretter en ny dynamisk række i driftslisten — samme mønster som tilfoejRenoveringRække(). */
-    tilfoejDriftRække() {
-        const liste = document.getElementById('inv-drift-liste');
-
-        const kort = document.createElement('div');
-        kort.className = 'renovering-kort';
-
-        const navnInput = document.createElement('input');
-        navnInput.type = 'text';
-        navnInput.className = 'modal-input';
-        navnInput.placeholder = 'Navn på omkostning';
-        navnInput.style.cssText = 'flex:1; min-width:0;';
-
-        const beloebInput = document.createElement('input');
-        beloebInput.type = 'number';
-        beloebInput.className = 'modal-input';
-        beloebInput.min = '0';
-        beloebInput.step = '0.01';
-        beloebInput.placeholder = 'fx. 10.000';
-        beloebInput.style.cssText = 'flex:1; min-width:0;';
-        this.blokerIkkeNumeriskInput(beloebInput);
-
-        const fjernKnap = document.createElement('button');
-        fjernKnap.type = 'button';
-        fjernKnap.className = 'modal-fjern-knap';
-        fjernKnap.innerHTML = '&times;';
-        fjernKnap.addEventListener('click', () => liste.removeChild(kort));
-
-        kort.appendChild(navnInput);
-        kort.appendChild(beloebInput);
-        kort.appendChild(fjernKnap);
-        liste.appendChild(kort);
     }
 
     /* gendanner trin 3-felterne fra formData ved navigation tilbage. */
@@ -634,48 +484,30 @@ class Portefolje {
         this.visStep(3);
     }
 
-    /* validerer trin 4 (driftsomkostninger) og sætter udlejningstoggle-lytteren op.
-       toggle.onchange tildeles direkte (frem for addEventListener) fordi modalen kan åbnes og lukkes
-       flere gange — direkte tildeling overskriver den tidligere lytter, mens addEventListener
-       ville stable lyttere op og afvikle dem flere gange ved hvert klik. */
+    /* SIDE 5: UDLEJNING */
+
+    /* validerer trin 4 (driftsomkostninger) og sætter udlejningstoggle-lytteren op. */
     næsteStep4() {
-        const korts = document.getElementById('inv-drift-liste').querySelectorAll('.renovering-kort');
+        const beloebInput = document.getElementById('inv-drift-beloeb');
+        this.fjernModalFejl(beloebInput);
 
-        let gyldig = true;
-        korts.forEach(kort => this.fjernModalFejl(kort.querySelectorAll('input')[1]));
-
-        const poster = [];
-        korts.forEach(kort => {
-            const inputs = kort.querySelectorAll('input');
-            const navnInput   = inputs[0];
-            const beloebInput = inputs[1];
-            const harNavn     = navnInput.value.trim() !== '';
-            const harBeloeb   = beloebInput.value.trim() !== '';
-
-            if (harBeloeb) {
-                const beloeb = parseFloat(beloebInput.value);
-                if (!Number.isFinite(beloeb) || beloeb < 0) {
-                    this.visModalFejl(beloebInput, 'Indtast et gyldigt beløb (0 eller derover).');
-                    gyldig = false;
-                } else {
-                    poster.push({ navn: navnInput.value.trim(), maanedligBeloeb: beloeb });
-                }
-            } else if (harNavn) {
-                poster.push({ navn: navnInput.value.trim(), maanedligBeloeb: null });
+        const beloebStr = beloebInput.value.trim();
+        if (beloebStr !== '') {
+            const beloeb = parseFloat(beloebStr);
+            if (!Number.isFinite(beloeb) || beloeb < 0) {
+                this.visModalFejl(beloebInput, 'Indtast et gyldigt beløb (0 eller derover).');
+                return;
             }
-        });
+        }
 
-        if (!gyldig) return;
+        this.formData.drift = {
+            navn: document.getElementById('inv-drift-navn').value.trim(),
+            beloeb: beloebStr !== '' ? parseFloat(beloebStr) : null
+        };
 
-        this.formData.drift = { poster };
-        console.log('Step 4 complete', this.formData);
-
-        ['inv-maanedlig-leje', 'inv-udlejningsudgifter'].forEach(id => {
-            this.blokerIkkeNumeriskInput(document.getElementById(id));
-        });
         const toggle = document.getElementById('udlejning-toggle');
         const detaljer = document.getElementById('udlejning-detaljer');
-        toggle.onchange = () => {
+        toggle.onchange = () => { /* toggle.onchange: sætter en funktion der kører hver gang brugeren slår udlejnings-togglen til eller fra. tildeles direkte (frem for addEventListener) fordi modalen kan åbnes og lukkes flere gange */
             if (toggle.checked) {
                 detaljer.style.cssText = 'display:flex; flex-direction:column; gap:24px;';
             } else {
@@ -690,30 +522,22 @@ class Portefolje {
     /* gendanner trin 4-felterne fra formData ved navigation tilbage. */
     tilbageStep5() {
         const d = this.formData.drift || {};
-        const liste = document.getElementById('inv-drift-liste');
-        liste.innerHTML = '';
-        (d.poster || []).forEach(post => {
-            this.tilfoejDriftRække();
-            const korts = liste.querySelectorAll('.renovering-kort');
-            const kort = korts[korts.length - 1];
-            const inputs = kort.querySelectorAll('input');
-            inputs[0].value = post.navn || '';
-            inputs[1].value = post.maanedligBeloeb ?? '';
-        });
+        document.getElementById('inv-drift-navn').value = d.navn || '';
+        document.getElementById('inv-drift-beloeb').value = d.beloeb ?? '';
         this.visStep(4);
     }
 
-    /* samler data fra alle fem trin og sender dem til serveren som ét POST-kald.
-       planlagteRenoveringOgForbedringer og driftsomkostninger beregnes her ved at summere
-       beløbene fra renoveringsposterne og driftsposterne via reduce — serveren gemmer kun totaler,
-       ikke de individuelle poster. */
-    async opretInvesteringscase() {
-        const toggle        = document.getElementById('udlejning-toggle');
-        const lejeEl        = document.getElementById('inv-maanedlig-leje');
-        const udgiftEl      = document.getElementById('inv-udlejningsudgifter');
-        const navnEl        = document.getElementById('inv-case-navn');
+    /* OPRETTELSE AF INVESTERINGSCASE */
+
+    /* samler data fra alle fem trin og sender dem til serveren som et POST-kald. 
+    "El" = Element */
+    async opretIC() {
+        const toggle = document.getElementById('udlejning-toggle');
+        const lejeEl = document.getElementById('inv-maanedlig-leje');
+        const udgiftEl = document.getElementById('inv-udlejningsudgifter');
+        const navnEl = document.getElementById('inv-case-navn');
         const beskrivelseEl = document.getElementById('inv-case-beskrivelse');
-        const udlejning     = toggle.checked;
+        const udlejning = toggle.checked;
 
         let gyldig = true;
         [lejeEl, udgiftEl, navnEl].forEach(el => this.fjernModalFejl(el));
@@ -752,20 +576,21 @@ class Portefolje {
         const drift = this.formData.drift || {};
 
         const parametre = {
-            ejendomspris:                      køb.ejendomspris ?? null,
-            advokatudgifter:                   køb.advokatudgifter ?? null,
-            tinglysningsudgifter:              køb.tinglysningsudgifter ?? null,
-            overtagelsesudgifter:              køb.overtagelsesudgifter ?? null,
-            koebsomkostninger:                 køb.koebsomkostninger ?? null,
-            laanebeloeb:                       laan.laanebeloeb ?? null,
-            rente:                             laan.rente ?? null,
-            loebetid:                          laan.loebetid ?? null,
-            afdragsfriPeriode:                 laan.afdragsfriPeriode ?? null,
-            laanetype:                         laan.laanetype ?? null,
-            planlagteRenoveringOgForbedringer: (renovering.poster || []).reduce((sum, p) => sum + (p.beloeb || 0), 0), /* summer alle renoveringsbeløb til ét samlet tal */
-            renoveringstidspunkt:              renovering.renoveringstidspunkt ?? null,
-            driftsomkostninger:                (drift.poster || []).reduce((sum, p) => sum + (p.maanedligBeloeb || 0), 0), /* summer alle månedlige driftsomkostninger */
-            udlejning,
+            ejendomspris: køb.ejendomspris ?? null,
+            advokatudgifter: køb.advokatudgifter ?? null,
+            tinglysningsudgifter: køb.tinglysningsudgifter ?? null,
+            overtagelsesudgifter: køb.overtagelsesudgifter ?? null,
+            koebsomkostninger: køb.koebsomkostninger ?? null,
+            laanebeloeb: laan.laanebeloeb ?? null,
+            rente: laan.rente ?? null,
+            loebetid: laan.loebetid ?? null,
+            afdragsfriPeriode: laan.afdragsfriPeriode ?? null,
+            laanetype: laan.laanetype ?? null,
+            planlagteRenoveringOgForbedringer: (renovering.poster || []).reduce((sum, p) => sum + (p.beloeb || 0), 0),
+            renoveringstidspunkt: renovering.renoveringstidspunkt ?? null,
+            driftsomkostninger: drift.beloeb ?? 0,
+            udlejning, /* altså enten er det valgt eller ej */
+            udlejningMaanederAarligt: parseInt(document.getElementById('inv-udlejning-maaneder').value) || 12,
             maanedligLeje,
             udlejningsudgifter,
         };
@@ -786,16 +611,341 @@ class Portefolje {
                 throw new Error(fejlData.fejl || `HTTP ${svar.status}`);
             }
             this.lukInvesteringModal();
-            await this.hentOgVisInvesteringscases();
+            await this.hentOgVisICs();
         } catch (fejl) {
             console.error('Kunne ikke oprette investeringscase:', fejl.message);
             alert('Der opstod en fejl. Prøv igen.');
         }
     }
 
-    /* escaper HTML-specialtegn inden brugerdata indsættes i template literals.
-       Forhindrer XSS-angreb hvor data med <script>-tags eller HTML-attributter ellers
-       ville blive fortolket og eksekveret af browseren som kode. */
+    /* ---------------------------------------------------------------------------------- */
+    /* OPDATERRING (EJENDOMSPROFILER) */
+    
+    åbnOpdaterEP(id, beskrivelse) {
+        this.opdaterModal.dataset.id = id; /* id gemmes på modal-elementets dataset så gemOpdateringEP() kan hente det ved klik på gem-knappen. */
+        this.opdaterBeskrivelse.value = beskrivelse;
+        this.opdaterModal.classList.add('aktiv');
+    }
+
+    lukOpdaterEP() {
+        this.opdaterModal.classList.remove('aktiv');
+    }
+
+    async gemOpdateringEP() {
+        const ejendomsprofilID = this.opdaterModal.dataset.id;
+        const beskrivelse = this.opdaterBeskrivelse.value.trim();
+
+        try {
+            const svar = await fetch('/api/ejendomsprofil/opdater', {
+                method: 'PUT', /* sender en PUT-anmodning med den opdaterede beskrivelse til serveren og genindlæser siden for at afspejle ændringen i porteføljekortet. */
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ejendomsprofilID, beskrivelse })
+            });
+            if (!svar.ok) throw new Error('Serverfejl');
+            this.lukOpdaterEP();
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke opdatere ejendomsprofil:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    /* OPDATERRING (INVESTERINGSCASE) */
+
+    /* åbner opdateringsmodalen for en investeringscase og forududfylder navn, beskrivelse og alle parameterfelter. */
+    åbnOpdaterIC(id, navn, beskrivelse, ic) {
+        this.opdaterICModal.dataset.id = id;
+        this.opdaterICNavn.value = navn;
+        this.opdaterICBeskrivelse.value = beskrivelse;
+
+        if (ic) {
+            const sæt = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val ?? ''; };
+            sæt('inv-opdater-ejendomspris', ic.ejendomspris);
+            sæt('inv-opdater-advokatudgifter', ic.advokatudgifter);
+            sæt('inv-opdater-tinglysningsudgifter', ic.tinglysningsudgifter);
+            sæt('inv-opdater-overtagelsesudgifter', ic.overtagelsesudgifter);
+            sæt('inv-opdater-koebsomkostninger', ic.koebsomkostninger);
+            sæt('inv-opdater-laanebeloeb', ic.laanebeloeb);
+            sæt('inv-opdater-rente', ic.rente);
+            sæt('inv-opdater-loebetid', ic.loebetid);
+            sæt('inv-opdater-afdragsfriperiode', ic.afdragsfriPeriode);
+            sæt('inv-opdater-laanetype', ic.laanetype);
+            sæt('inv-opdater-renoveringer', ic.planlagteRenoveringOgForbedringer);
+            sæt('inv-opdater-renoveringstidspunkt', ic.renoveringstidspunkt);
+            sæt('inv-opdater-driftsomkostninger', ic.driftsomkostninger);
+            sæt('inv-opdater-udlejning', ic.udlejning ? '1' : '0');
+            sæt('inv-opdater-udlejning-maaneder', ic.udlejningMaanederAarligt);
+            sæt('inv-opdater-maanedligleje', ic.maanedligLeje);
+            sæt('inv-opdater-udlejningsudgifter', ic.udlejningsudgifter);
+        }
+
+        this.opdaterICModal.classList.add('aktiv');
+    }
+
+    lukOpdaterIC() {
+        this.opdaterICModal.classList.remove('aktiv');
+    }
+
+    async gemOpdateringIC() {
+        const investeringscaseID = this.opdaterICModal.dataset.id;
+        const navn = this.opdaterICNavn.value.trim();
+        const beskrivelse = this.opdaterICBeskrivelse.value.trim();
+
+        if (!navn) {
+            this.opdaterICNavn.focus();
+            return;
+        }
+
+        const hent = (id) => document.getElementById(id)?.value ?? '';
+        const tal = (id) => { const v = hent(id); return v !== '' ? parseFloat(v) : null; };
+        const int = (id) => { const v = hent(id); return v !== '' ? parseInt(v, 10) : null; };
+
+        const parametre = {
+            ejendomspris: tal('inv-opdater-ejendomspris'),
+            advokatudgifter: tal('inv-opdater-advokatudgifter'),
+            tinglysningsudgifter: tal('inv-opdater-tinglysningsudgifter'),
+            overtagelsesudgifter: tal('inv-opdater-overtagelsesudgifter'),
+            koebsomkostninger: tal('inv-opdater-koebsomkostninger'),
+            laanebeloeb: tal('inv-opdater-laanebeloeb'),
+            rente: tal('inv-opdater-rente'),
+            loebetid: int('inv-opdater-loebetid'),
+            afdragsfriPeriode: int('inv-opdater-afdragsfriperiode'),
+            laanetype: hent('inv-opdater-laanetype') || null,
+            planlagteRenoveringOgForbedringer: tal('inv-opdater-renoveringer'),
+            renoveringstidspunkt: int('inv-opdater-renoveringstidspunkt'),
+            driftsomkostninger: tal('inv-opdater-driftsomkostninger'),
+            udlejning: hent('inv-opdater-udlejning') === '1',
+            udlejningMaanederAarligt: int('inv-opdater-udlejning-maaneder') || null,
+            maanedligLeje: tal('inv-opdater-maanedligleje'),
+            udlejningsudgifter: tal('inv-opdater-udlejningsudgifter'),
+        };
+
+        /* sender to parallelle PUT-anmodninger: en med navn/beskrivelse og en med alle parameterfelter. */
+        try {
+            const [svar1, svar2] = await Promise.all([
+                fetch('/api/investeringscase/opdater', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ investeringscaseID, navn, beskrivelse })
+                }),
+                fetch('/api/investeringscase/opdaterParametre', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ investeringscaseID, parametre })
+                })
+            ]);
+            if (!svar1.ok || !svar2.ok) throw new Error('Serverfejl');
+            this.lukOpdaterIC();
+            await this.hentOgVisICs();
+        } catch (fejl) {
+            console.error('Kunne ikke opdatere investeringscase:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    /* ---------------------------------------------------------------------------------- */
+    /* SLETNING (EJENDOMSPROFILER) */
+
+    /* beder brugeren bekræfte inden sletning, da handlingen ikke kan fortrydes. Genindlæser siden så det slettede kort forsvinder fra porteføljegriddet. */
+    async sletEP(id) {
+        if (!confirm('Er du sikker på, at du vil slette denne ejendomsprofil? Dette kan ikke fortrydes.')) return;
+        try {
+            const svar = await fetch(`/api/ejendomsprofil/slet/${id}`, { method: 'DELETE' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke slette ejendomsprofil:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    /* SLETNING (INVESTERINGSCASES) */
+    
+    /* beder brugeren bekræfte inden sletning og opdaterer derefter listen uden fuld sidereload. */
+    async sletInvesteringscase(id) {
+        if (!confirm('Er du sikker på, at du vil slette denne investeringscase? Dette kan ikke fortrydes.')) return;
+        try {
+            const svar = await fetch(`/api/investeringscase/slet/${id}`, { method: 'DELETE' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            await this.hentOgVisICs();
+        } catch (fejl) {
+            console.error('Kunne ikke slette investeringscase:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+
+    /* ---------------------------------------------------------------------------------- */
+    /* DUPLIKERING (EJENDOMSPROFILER) */
+    
+    /* beder brugeren bekræfte inden duplikering og genindlæser siden så den nye profil vises. */
+    async duplikerEP(id) {
+        if (!confirm('Du har trykket på dupliker. Vil du fortsætte?')) return;
+        try {
+            const svar = await fetch(`/api/ejendomsprofil/dupliker/${id}`, { method: 'POST' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke duplikere ejendomsprofil:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    /* DUPLIKERINGSLOGIK (INVESTERINGSCASE) */
+    
+    /* beder brugeren bekræfte inden duplikering og opdaterer investeringscase-listen uden fuld sidereload. */
+    async duplikerIC(id) {
+        if (!confirm('Du har trykket på dupliker. Vil du fortsætte?')) return;
+        try {
+            const svar = await fetch(`/api/investeringscase/dupliker/${id}`, { method: 'POST' });
+            if (!svar.ok) throw new Error('Serverfejl');
+            location.reload();
+        } catch (fejl) {
+            console.error('Kunne ikke duplikere investeringscase:', fejl);
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    }
+
+    /* ---------------------------------------------------------------------------------- */
+    /* SIMULER OG SAMMENLIGN VIDEREGIVELE */
+
+    /* sender brugeren til simuler_case.html med investeringscaseID som query-parameter, så siden kan forududvælge den korrekte case i dropdown'en. */
+    simulerCase(investeringscaseID) {
+        window.location.href = `/simuler_case.html?id=${investeringscaseID}`;
+    }
+
+    /* sender brugeren til sammenlign_cases.html med investeringscaseID som query-parameter. */
+    sammenlignCase(investeringscaseID) {
+        window.location.href = `/sammenlign_cases.html?id=${investeringscaseID}`;
+    }
+
+
+    /* ---------------------------------------------------------------------------------- */
+    /* INFOVISNING (EJENDOMSPROFIL) */
+
+    /* viser info-modalen for en ejendomsprofil med adresse, beskrivelse og BBR-ejendomsdata. BBR-data hentes fra vores eget API frem for fra BBR direkte, fordi dataene allerede er gemt i databasen fra da profilen blev oprettet. */
+    async visEPInfo(id) {
+        const profil = this.profiler.find(p => String(p.ejendomsprofilID) === String(id));
+        if (!profil) return;
+
+        const ejendomSvar = await fetch(`/api/ejendomsprofil/ejendomsdata/${id}`);
+        const ed = ejendomSvar.ok ? await ejendomSvar.json() : null;
+
+        const formatDato = (d) => new Date(d).toLocaleDateString('da-DK', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+
+        document.getElementById('info-ep-titel').textContent = profil.navn;
+
+        const etage = profil.etage ? `, ${profil.etage}` : '';
+        const doer = profil.doer ? `. ${profil.doer}` : '';
+        const adresse = `${profil.vejnavn} ${profil.husnummer}${etage}${doer}, ${profil.postnummer} ${profil.bynavn}`;
+
+        document.getElementById('info-ep-indhold').innerHTML = `
+            <table class="noegletal-tabel">
+              <tbody>
+                <tr><td class="noegletal-label">Adresse</td>
+                    <td class="noegletal-vaerdi">${this.undgåHTML(adresse)}</td></tr>
+                <tr><td class="noegletal-label">Beskrivelse</td>
+                    <td class="noegletal-vaerdi">
+                      ${profil.beskrivelse ? this.undgåHTML(profil.beskrivelse) : '—'}
+                    </td></tr>
+                <tr><td class="noegletal-label">Tilknyttede cases</td>
+                    <td class="noegletal-vaerdi">${profil.antalCases}</td></tr>
+                <tr><td class="noegletal-label">Oprettet</td>
+                    <td class="noegletal-vaerdi">${formatDato(profil.oprettetDato)}</td></tr>
+                ${ed ? `
+                <tr><td class="noegletal-label" colspan="2"
+                    style="padding-top:16px; font-weight:bold; color:var(--farve-tekst-moerk);">
+                    Ejendomsdata (BBR)</td></tr>
+                <tr><td class="noegletal-label">Ejendomstype</td>
+                    <td class="noegletal-vaerdi">${ed.ejendomstype ?? '—'}</td></tr>
+                <tr><td class="noegletal-label">Byggeår</td>
+                    <td class="noegletal-vaerdi">${ed.byggeaar ?? '—'}</td></tr>
+                <tr><td class="noegletal-label">Boligareal</td>
+                    <td class="noegletal-vaerdi">${ed.boligareal ? ed.boligareal + ' m²' : '—'}</td></tr>
+                <tr><td class="noegletal-label">Antal værelser</td>
+                    <td class="noegletal-vaerdi">${ed.antalVaerelser ?? '—'}</td></tr>
+                <tr><td class="noegletal-label">Grundareal</td>
+                    <td class="noegletal-vaerdi">${ed.grundareal ? ed.grundareal + ' m²' : '—'}</td></tr>
+                <tr><td class="noegletal-label">Data hentet</td>
+                    <td class="noegletal-vaerdi">${ed.senestHentet ? formatDato(ed.senestHentet) : '—'}</td></tr>
+                ` : ''}
+              </tbody>
+            </table>`;
+
+        document.getElementById('info-ep-modal-overlay').classList.add('aktiv');
+    }
+
+    /* INFOVISNING (INVESTERINGSCASE) */
+
+    /* viser info-modalen for en investeringscase med alle finansielle parametre. Dataene er allerede i this.cases fra hentOgVisICs(). */
+    visICInfo(id) {
+        const ic = this.cases.find(c => String(c.investeringscaseID) === String(id));
+        if (!ic) return;
+
+        document.getElementById('info-ic-titel').textContent = ic.navn;
+
+        const dato = new Date(ic.oprettetDato).toLocaleDateString('da-DK', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        });
+
+        const vis = (val, suffix = '') => val != null ? `${val}${suffix}` : '—';
+
+        const sektion = (tekst) =>
+            `<tr><td class="noegletal-label" colspan="2"
+                style="padding-top:16px; font-weight:bold; color:var(--farve-tekst-moerk);">${tekst}</td></tr>`;
+
+        document.getElementById('info-ic-indhold').innerHTML = `
+            <table class="noegletal-tabel">
+              <tbody>
+                <tr><td class="noegletal-label">Tilknyttet ejendom</td>
+                    <td class="noegletal-vaerdi">${this.undgåHTML(ic.ejendomsprofilNavn)}</td></tr>
+                <tr><td class="noegletal-label">Oprettet</td>
+                    <td class="noegletal-vaerdi">${dato}</td></tr>
+                ${sektion('Købsdetaljer')}
+                <tr><td class="noegletal-label">Ejendomspris</td>
+                    <td class="noegletal-vaerdi">${vis(ic.ejendomspris, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Advokatudgifter</td>
+                    <td class="noegletal-vaerdi">${vis(ic.advokatudgifter, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Tinglysningsudgifter</td>
+                    <td class="noegletal-vaerdi">${vis(ic.tinglysningsudgifter, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Overtagelsesudgifter</td>
+                    <td class="noegletal-vaerdi">${vis(ic.overtagelsesudgifter, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Øvrige købsomkostninger</td>
+                    <td class="noegletal-vaerdi">${vis(ic.koebsomkostninger, ' kr.')}</td></tr>
+                ${sektion('Lånedetaljer')}
+                <tr><td class="noegletal-label">Lånebeløb</td>
+                    <td class="noegletal-vaerdi">${vis(ic.laanebeloeb, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Rente</td>
+                    <td class="noegletal-vaerdi">${vis(ic.rente, ' %')}</td></tr>
+                <tr><td class="noegletal-label">Løbetid</td>
+                    <td class="noegletal-vaerdi">${vis(ic.loebetid, ' mdr.')}</td></tr>
+                <tr><td class="noegletal-label">Afdragsfri periode</td>
+                    <td class="noegletal-vaerdi">${vis(ic.afdragsfriPeriode, ' mdr.')}</td></tr>
+                <tr><td class="noegletal-label">Lånetype</td>
+                    <td class="noegletal-vaerdi">${ic.laanetype ?? '—'}</td></tr>
+                ${sektion('Renovering & Drift')}
+                <tr><td class="noegletal-label">Planlagte renoveringer</td>
+                    <td class="noegletal-vaerdi">${vis(ic.planlagteRenoveringOgForbedringer, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Renoveringstidspunkt</td>
+                    <td class="noegletal-vaerdi">${vis(ic.renoveringstidspunkt, '. måned')}</td></tr>
+                <tr><td class="noegletal-label">Driftsomkostninger pr. måned</td>
+                    <td class="noegletal-vaerdi">${vis(ic.driftsomkostninger, ' kr.')}</td></tr>
+                ${sektion('Udlejning')}
+                <tr><td class="noegletal-label">Udlejes</td>
+                    <td class="noegletal-vaerdi">${ic.udlejning ? 'Ja' : 'Nej'}</td></tr>
+                <tr><td class="noegletal-label">Månedlig leje</td>
+                    <td class="noegletal-vaerdi">${vis(ic.maanedligLeje, ' kr.')}</td></tr>
+                <tr><td class="noegletal-label">Udlejningsudgifter pr. måned</td>
+                    <td class="noegletal-vaerdi">${vis(ic.udlejningsudgifter, ' kr.')}</td></tr>
+              </tbody>
+            </table>`;
+
+        document.getElementById('info-ic-modal-overlay').classList.add('aktiv');
+    }
+
+    /* Forhindrer XSS-angreb hvor data med <script>-tags eller HTML-attributter ellers ville blive fortolket og eksekveret af browseren som kode. */ 
     undgåHTML(tekst) {
         return tekst
             .replace(/&/g, '&amp;')

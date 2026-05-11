@@ -53,7 +53,6 @@
 
   </section>
 
-  
   <!-- INVESTERINGSCASE MODAL -->
   <div class="modal-overlay" id="investering-modal-overlay">
     <div class="modal">
@@ -70,17 +69,17 @@
         <div class="modal-felt">
           <label class="modal-label" for="inv-advokatudgifter">ADVOKATUDGIFTER (kr.)</label>
           <p class="modal-felt-beskrivelse">Honorar til advokat eller juridisk rådgiver for gennemgang af købsaftale og skødeskrivning.</p>
-          <input class="modal-input" type="number" min="0" step="0.01" id="inv-advokatudgifter" placeholder="fx. 50.000">
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-advokatudgifter" placeholder="fx. 20.000">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-tinglysningsudgifter">TINGLYSNINGSUDGIFTER (kr.)</label>
           <p class="modal-felt-beskrivelse">Offentlige gebyrer til staten for at tinglyse skøde og eventuelle pantebreve.</p>
-          <input class="modal-input" type="number" min="0" step="0.01" id="inv-tinglysningsudgifter" placeholder="fx. 15.000">
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-tinglysningsudgifter" placeholder="fx. 105.000">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-overtagelsesudgifter">OVERTAGELSESUDGIFTER (kr.)</label>
           <p class="modal-felt-beskrivelse">Udgifter til køberrådgivning, byggeteknisk gennemgang eller øvrige omkostninger ved selve overtagelsen.</p>
-          <input class="modal-input" type="number" min="0" step="0.01" id="inv-overtagelsesudgifter" placeholder="fx. 5.000">
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-overtagelsesudgifter" placeholder="fx. 15.000">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-koebsomkostninger">KØBSOMKOSTNINGER (kr.)</label>
@@ -100,22 +99,22 @@
         <div class="modal-felt">
           <label class="modal-label" for="inv-laanebeloeb">LÅNEBELØB (kr.)</label>
           <p class="modal-felt-beskrivelse">Det samlede beløb, der skal lånes i banken eller realkreditinstituttet.</p>
-          <input class="modal-input" type="number" min="0" step="0.01" id="inv-laanebeloeb" placeholder="fx. 5.000.000">
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-laanebeloeb" placeholder="fx. 11.000.000">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-rente">RENTE (%)</label>
           <p class="modal-felt-beskrivelse">Den årlige nominelle rente på lånet angivet i procent.</p>
-          <input class="modal-input" type="number" min="0" step="0.01" id="inv-rente" placeholder="fx. 1,5">
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-rente" placeholder="fx. 4">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-loebetid">LØBETID (MÅNEDER)</label>
-          <p class="modal-felt-beskrivelse">Lånets samlede varighed angivet i antal måneder (typisk mellem 120 og 360 måneder (15-30 år)).</p>
-          <input class="modal-input" type="number" min="1" max="360" step="1" id="inv-loebetid" placeholder="fx. 180 (15 år)">
+          <p class="modal-felt-beskrivelse">Lånets samlede varighed angivet i antal måneder.</p>
+          <input class="modal-input" type="number" min="1" step="1" id="inv-loebetid" placeholder="fx. 180 (15 år)">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-afdragsfri">AFDRAGSFRI PERIODE (MÅNEDER)</label>
           <p class="modal-felt-beskrivelse">Antal måneder i starten af lånets løbetid, hvor der kun betales renter og ikke afdrag på gælden.</p>
-          <input class="modal-input" type="number" min="0" step="1" id="inv-afdragsfri" placeholder="fx. 60 (5 år)">
+          <input class="modal-input" type="number" min="0" step="1" id="inv-afdragsfri" placeholder="fx. 12 (1 år)">
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-laanetype">LÅNETYPE (VALG)</label>
@@ -146,8 +145,8 @@
         </div>
         <div class="modal-felt">
           <label class="modal-label" for="inv-renoveringstidspunkt">RENOVERINGSTIDSPUNKT (MÅNEDER)</label>
-          <p class="modal-felt-beskrivelse">Angiv hvor mange måneder efter købet de planlagte renoveringer forventes udført (fx. 24 måneder (2 år) efter køb).</p>
-          <input class="modal-input" type="number" min="0" step="1" id="inv-renoveringstidspunkt" placeholder="fx. 24">
+          <p class="modal-felt-beskrivelse">Angiv hvor mange måneder efter købet de planlagte renoveringer forventes udført.</p>
+          <input class="modal-input" type="number" min="0" step="1" id="inv-renoveringstidspunkt" placeholder="fx. 24 (2 år)">
         </div>
         <div class="modal-knapper">
           <button class="modal-annuller-knap" id="inv-step3-tilbage">Tilbage</button>
@@ -160,10 +159,12 @@
         <p class="modal-beskrivelse">Side 4 af 5 - Opret investeringscase</p>
         <h2 class="modal-titel">Driftsomkostninger ⚙️</h2>
         <div class="modal-felt">
-          <label class="modal-label">DRIFTSOMKOSTNINGER</label>
-          <p class="modal-felt-beskrivelse">Angiv eventuelle månedlige driftsomkostninger forbundet med ejendommen, såsom ejendomsskatter og forsikringer.</p>
-          <div id="inv-drift-liste" style="display: flex; flex-direction: column; gap: 12px;"></div>
-          <button type="button" class="modal-tilfoej-knap" id="inv-tilfoej-drift">Tilføj omkostning</button>
+          <label class="modal-label" for="inv-drift-navn">NAVN PÅ OMKOSTNING</label>
+          <input class="modal-input" type="text" id="inv-drift-navn" placeholder="fx. Ejendomsskat og forsikring">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-drift-beloeb">MÅNEDLIGT BELØB (kr.)</label>
+          <input class="modal-input" type="number" id="inv-drift-beloeb" min="0" step="0.01" placeholder="fx. 3.000">
         </div>
         <div class="modal-knapper">
           <button class="modal-annuller-knap" id="inv-step4-tilbage">Tilbage</button>
@@ -177,7 +178,7 @@
         <h2 class="modal-titel">Udlejning 🔑</h2>
         <div class="modal-felt">
           <label class="modal-label" for="udlejning-toggle">UDLEJNING</label>
-          <p class="modal-felt-beskrivelse">Markér om ejendommen skal udlejes helt eller delvist. Dette aktiverer de efterfølgende felter.</p>
+          <p class="modal-felt-beskrivelse">Marker om ejendommen skal udlejes helt eller delvist. Dette aktiverer de efterfølgende felter.</p>
           <label class="modal-toggle-label">
             <input type="checkbox" id="udlejning-toggle" class="modal-toggle-checkbox">
             <span>Ja, ejendommen udlejes</span>
@@ -193,6 +194,11 @@
             <label class="modal-label" for="inv-udlejningsudgifter">UDLEJNINGSUDGIFTER</label>
             <p class="modal-felt-beskrivelse">Løbende månedlige omkostninger specifikt relateret til udlejningen, såsom administrationsgebyrer, annoncering eller udvidet forsikring.</p>
             <input class="modal-input" type="number" min="0" step="0.01" id="inv-udlejningsudgifter" placeholder="fx. 2.500">
+          </div>
+          <div class="modal-felt">
+            <label class="modal-label" for="inv-udlejning-maaneder">ANTAL MÅNEDER TIL UDLEJNING ÅRLIGT</label>
+            <p class="modal-felt-beskrivelse">Angiv hvor mange måneder om året ejendommen forventes udlejet. Fx. 12 for helårsleje eller 6 for halvårlig udlejning.</p>
+            <input class="modal-input" type="number" id="inv-udlejning-maaneder" min="1" max="12" step="1" placeholder="fx. 12">
           </div>
         </div>
         <hr class="modal-divider">
@@ -234,13 +240,96 @@
   <div class="modal-overlay" id="opdater-investeringscase-modal-overlay">
     <div class="modal">
       <h2 class="modal-titel">Opdater investeringscase</h2>
-      <div class="modal-felt">
-        <label class="modal-label" for="opdater-ic-navn">NAVN</label>
-        <input class="modal-input" type="text" id="opdater-ic-navn">
-      </div>
-      <div class="modal-felt">
-        <label class="modal-label" for="opdater-ic-beskrivelse">BESKRIVELSE</label>
-        <textarea class="modal-textarea" id="opdater-ic-beskrivelse" rows="4"></textarea>
+      <div id="opdater-ic-indhold" style="max-height: 60vh; overflow-y: auto; margin-top: 24px;">
+        <div class="modal-felt">
+          <label class="modal-label" for="opdater-ic-navn">NAVN</label>
+          <input class="modal-input" type="text" id="opdater-ic-navn">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="opdater-ic-beskrivelse">BESKRIVELSE</label>
+          <textarea class="modal-textarea" id="opdater-ic-beskrivelse" rows="4"></textarea>
+        </div>
+        <p class="modal-label" style="font-weight: bold; color: var(--farve-tekst-moerk); margin-top: 16px;">Købsdetaljer</p>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-ejendomspris">EJENDOMSPRIS (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-ejendomspris">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-advokatudgifter">ADVOKATUDGIFTER (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-advokatudgifter">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-tinglysningsudgifter">TINGLYSNINGSUDGIFTER (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-tinglysningsudgifter">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-overtagelsesudgifter">OVERTAGELSESUDGIFTER (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-overtagelsesudgifter">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-koebsomkostninger">ØVRIGE KØBSOMKOSTNINGER (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-koebsomkostninger">
+        </div>
+        <p class="modal-label" style="font-weight: bold; color: var(--farve-tekst-moerk); margin-top: 16px;">Lånedetaljer</p>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-laanebeloeb">LÅNEBELØB (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-laanebeloeb">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-rente">RENTE (%)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-rente">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-loebetid">LØBETID (MÅNEDER)</label>
+          <input class="modal-input" type="number" min="1" step="1" id="inv-opdater-loebetid">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-afdragsfriperiode">AFDRAGSFRI PERIODE (MÅNEDER)</label>
+          <input class="modal-input" type="number" min="0" step="1" id="inv-opdater-afdragsfriperiode">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-laanetype">LÅNETYPE</label>
+          <select class="modal-input" id="inv-opdater-laanetype">
+            <option value="">Vælg lånetype</option>
+            <option value="Realkreditlaan">Realkreditlån</option>
+            <option value="Banklaan">Banklån</option>
+            <option value="Andelsboliglaan">Andelsboliglån</option>
+            <option value="Privatlaan">Privatlån</option>
+          </select>
+        </div>
+        <p class="modal-label" style="font-weight: bold; color: var(--farve-tekst-moerk); margin-top: 16px;">Renovering & Drift</p>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-renoveringer">PLANLAGTE RENOVERINGER (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-renoveringer">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-renoveringstidspunkt">RENOVERINGSTIDSPUNKT (MÅNEDER)</label>
+          <input class="modal-input" type="number" min="0" step="1" id="inv-opdater-renoveringstidspunkt">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-driftsomkostninger">DRIFTSOMKOSTNINGER PR. MÅNED (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-driftsomkostninger">
+        </div>
+        <p class="modal-label" style="font-weight: bold; color: var(--farve-tekst-moerk); margin-top: 16px;">Udlejning</p>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-udlejning">UDLEJES</label>
+          <select class="modal-input" id="inv-opdater-udlejning">
+            <option value="0">Nej</option>
+            <option value="1">Ja</option>
+          </select>
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-maanedligleje">MÅNEDLIG LEJE (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-maanedligleje">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-udlejningsudgifter">UDLEJNINGSUDGIFTER PR. MÅNED (kr.)</label>
+          <input class="modal-input" type="number" min="0" step="0.01" id="inv-opdater-udlejningsudgifter">
+        </div>
+        <div class="modal-felt">
+          <label class="modal-label" for="inv-opdater-udlejning-maaneder">ANTAL MÅNEDER TIL UDLEJNING ÅRLIGT</label>
+          <input class="modal-input" type="number" id="inv-opdater-udlejning-maaneder" min="1" max="12" step="1" placeholder="fx. 12">
+        </div>
       </div>
       <div class="modal-knapper">
         <button class="modal-annuller-knap" id="opdater-ic-modal-annuller">Annuller</button>
@@ -276,17 +365,39 @@
       <div class="footer-kolonne">
         <h4 class="footer-overskrift">SOCIALE MEDIER</h4>
         <ul class="footer-liste">
-          <li><a href="#">LinkedIn</a></li>
-          <li><a href="#">Instagram</a></li>
-          <li><a href="#">Twitter / X</a></li>
+          <li>LinkedIn</li>
+          <li>Instagram</li>
+          <li>Twitter / X</li>
         </ul>
       </div>
     </div>
     <div class="footer-streg"></div>
   </footer>
   
+  <!-- INFO MODAL: EJENDOMSPROFIL -->
+  <div class="modal-overlay" id="info-ep-modal-overlay">
+    <div class="modal">
+      <h2 class="modal-titel" id="info-ep-titel"></h2>
+      <div id="info-ep-indhold"></div>
+      <div class="modal-knapper">
+        <button class="modal-gem-knap" id="info-ep-luk">Luk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO MODAL: INVESTERINGSCASE -->
+  <div class="modal-overlay" id="info-ic-modal-overlay">
+    <div class="modal">
+      <h2 class="modal-titel" id="info-ic-titel"></h2>
+      <div id="info-ic-indhold"></div>
+      <div class="modal-knapper">
+        <button class="modal-gem-knap" id="info-ic-luk">Luk</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/portefølje.js"></script>
-  
+
 </body>
 
 </html>

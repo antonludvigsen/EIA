@@ -1,112 +1,185 @@
+/* simulering.js indeholder al domænelogik for investeringssimulering.
+
+Modulet eksporterer to ting: klassen Simulering og hjælpefunktionen beregnMaanedligYdelse.
+
+beregnMaanedligYdelse er udskilt fra klassen for at bruge den som unit test.
+
+Simulering.eksekver() er den eneste metode der kalder beregnMaanedligYdelse, og den er det naturlige indgangspunkt for at køre en simulering. */
+
 const simuleringResultat = require('./simuleringResultat');
 
-/* beregnMaanedligYdelse() er en hjælpefunktion til låneberegning.
-Den er lagt uden for klassen, fordi den er en isoleret matematisk beregning, som senere kan unit-testes direkte. */
-function beregnMaanedligYdelse(laanebeloeb, rente, loebetid) {
-    const maanedligRente = rente / 100 / 12; 
-    const antalMaaneder = loebetid * 12;
+/* Udskilt fra klassen så den kan unit-testes direkte.
 
-    /* Hvis renten er 0, bruges en simpel beregning uden rente.
-    Det er et edge case, fordi annuitetsformlen ellers vil dividere med 0. */
+Beregningen af den månedlige låneydelse er baseret på den klassiske annuitetsformel for annuitetslån. Formlen er hentet fra Systime Matematik Finansiel Regning: https://mathfc.systime.dk/?id=576 */
+function beregnMaanedligYdelse(laanebeloeb, rente, loebetid) {
+
+    /* omdanner den årlige rente fra procent til en månedlig decimalrente. fx. 4% om året -> 4 / 100 = 0,04 -> 0,04 / 12 = 0,00333... pr. måned */
+    const maanedligRente = rente / 100 / 12;
+
+    /* løbetiden er allerede i måneder, ingen omregning nødvendig */
+    const antalMaaneder = loebetid;
+
+    /* særtilfælde: hvis renten er 0% giver annuitetsformlen division med nul, så i stedet fordeles lånet bare ligeligt over alle måneder */
     if (maanedligRente === 0) {
         return laanebeloeb / antalMaaneder;
     }
 
-    /* Annuitetsformlen beregner en fast månedlig ydelse på lånet.
-    Den er valgt, fordi den er enkel, realistisk og nem at forklare til eksamen. */
-    return laanebeloeb * 
-    (maanedligRente * Math.pow(1 + maanedligRente, antalMaaneder)) /
-    (Math.pow(1 + maanedligRente, antalMaaneder) - 1);
+    /* (1 + r)^(-n): tilbagediskonteringsfaktoren fortæller hvor meget en krone til betaling om n måneder er værd i dag ved renten r. Jo højere rente og jo længere løbetid, desto tættere på 0 */
+    const renteFaktor = Math.pow(1 + maanedligRente, -antalMaaneder);
+
+    /* 1 - (1+r)^(-n): nævneren i annuitetsformlen. Den er større jo højere renten er og jo kortere løbetiden er */
+    const naevner = 1 - renteFaktor;
+
+    /* r / (1 - (1+r)^(-n)): annuitetsfaktoren, dvs. den andel af lånebeløbet man skal betale hver måned for at tilbagebetale præcis til tid */
+    const annuitetsFaktor = maanedligRente / naevner;
+
+    /* den faste månedlige ydelse = lånebeløb * annuitetsfaktoren. Denne ydelse er konstant i hele lånets løbetid (forudsat fast rente) */
+    return laanebeloeb * annuitetsFaktor;
 }
 
-/* Simulering repræsenterer den beregning, der fremskriver en investeringscase over tid.
-Klassen passer til DCD'et, hvor Simulering producerer et SimuleringResultat. */
-
 class Simulering {
+
+    /* tidshorisont angives i år og bestemmer hvor mange iterationer eksekver() kører (tidshorisont * 12). oprettetDato sættes i constructoren og gemmes ikke i databasen. den bruges kun til sporbarhed i tilfælde af fejlsøgning. */
     constructor(tidshorisont) {
-
-        /* tidshorisont er antal år simuleringen skal køre */
         this.tidshorisont = tidshorisont;
-
-        /* oprettetDato sættes automatisk, når simuleringen oprettes */
         this.oprettetDato = new Date();
     }
 
-     /* eksekver() er hovedmetoden.
-    Den modtager investeringsparametre og beregner cashflow, gæld og egenkapital år for år. */
+    /* eksekver() er hovedmetoden. Den modtager investeringsparametre og beregner cashflow, gæld, aktiver,
+    likviditetsholdning og egenkapital måned for måned. tidshorisont er i år, så løkken kører tidshorisont * 12 iterationer. */
     eksekver(parametre) {
         this.validerParametre(parametre)
 
+        /* de fem tidsserier der bygges op måned for måned og til sidst returneres */
         const egenkapitalOverTid = [];
         const cashflowOverTid = [];
         const gaeldOverTid = [];
+        const aktiverOverTid = [];
+        const likviditetsholdningOverTid = [];
 
+        /* gælden starter på det fulde lånebeløb og falder med afdragene hver måned */
         let gaeld = parametre.laanebeloeb;
 
-        const maanedligYdelse = beregnMaanedligYdelse(
-            parametre.laanebeloeb,
-            parametre.rente,
-            parametre.loebetid
-        );
+        /* løbende sum af alle måneders cashflow som bruges til at beregne egenkapitalen */
+        let akkumuleretCashflow = 0;
 
-        for (let aar = 1;  aar <= this.tidshorisont; aar++) {
-            const aarligLeje = parametre.udlejning ? parametre.maanedligLeje * 12 : 0;
-            const aarligeUdlejningsudgifter = parametre.udlejning ? parametre.udlejningsudgifter * 12 : 0;
-            const aarligeDriftomkostninger = parametre.driftsomkostninger * 12;
+        /* løbende sum af alle måneders lejeindtægt. dette er likviditetsholdningen */
+        let akkumuleretLeje = 0;
 
-            /* I en afdragsfri periode betales der kun renter, og gælden falder derfor ikke. */
-            const aarligeRente = gaeld * (parametre.rente / 100);
-            const erAfdragsfritAar = aar <= parametre.afdragsfriPeriode;
+        /* vi antager 4% årlig prisstigning på ejendommen, hvilket er en fast antagelse i modellen */
+        const aarligVaerdistigning = 0.04;
 
-            let aarligeYdelse;
+        /* omregner den årlige stigning til en ækvivalent månedlig faktor via renters rente. (1 + 0,04)^(1/12) - 1 ≈ 0,00327 pr. måned. Giver præcis 4% stigning over 12 måneder */
+        const maanedligVaerdistigning = Math.pow(1 + aarligVaerdistigning, 1 / 12) - 1;
+
+        /* løkken kører en gang per måned i hele tidshorisonten */
+        for (let maaned = 1; maaned <= this.tidshorisont * 12; maaned++) {
+
+            /* --- Udlejning --- */
+
+            /* antal måneder ejendommen udlejes per år (standard: 12 = helårlig udlejning) */
+            const udlejningsMaaneder = parametre.udlejningMaanederAarligt ?? 12;
+
+            /* brøk af året med udlejning: fx 6 måneder = 0,5. Bruges til at skalere lejeindtægten til en månedlig gennemsnitsindtægt */
+            const udlejningsBrøk = udlejningsMaaneder / 12;
+
+            /* lejeindtægt denne måned: kun hvis udlejning er slået til. fx. månedlig leje 10.000 kr. * 0,5 (halvårlig) = 5.000 kr. pr. måned i gennemsnit */
+            const maanedligLejeIndtægt = parametre.udlejning ? parametre.maanedligLeje * udlejningsBrøk : 0;
+
+            /* udgifter til administration og vedligehold af udlejningen: kun hvis udlejning er slået til */
+            const maanedligeUdlejningsudgifter = parametre.udlejning ? parametre.udlejningsudgifter : 0;
+
+            /* faste månedlige driftsomkostninger (fx ejendomsskat, forsikring) */
+            const maanedligeDriftomkostninger = parametre.driftsomkostninger;
+
+            /* --- Lån og ydelse --- */
+
+            /* renteudgiften denne måned = restgæld * månedlig rente. Falder over tid fordi gælden nedbringes med afdragene */
+            const maanedligRente = gaeld * (parametre.rente / 100 / 12);
+
+            /* er vi inden for den afdragsfrie periode? i så fald betales kun renter */
+            const erAfdragsfritMaaned = maaned <= parametre.afdragsfriPeriode;
+
+            let maanedligYdelse;
             let afdrag;
 
-            if (erAfdragsfritAar) {
-                aarligeYdelse = aarligeRente;
+            if (erAfdragsfritMaaned) {
+                /* i den afdragsfrie periode betales kun renterne. gælden falder ikke */
+                maanedligYdelse = maanedligRente;
                 afdrag = 0;
             } else {
-                aarligeYdelse = maanedligYdelse * 12;
-                afdrag = Math.max(0, aarligeYdelse - aarligeRente);
+                /* efter den afdragsfrie periode betales den faste annuitetsydelse. Bemærk: ydelsen beregnes altid ud fra det oprindelige lånebeløb og den fulde løbetid, ikke ud fra restgælden som er korrekt for annuitetslån. */
+                maanedligYdelse = beregnMaanedligYdelse(
+                    parametre.laanebeloeb,
+                    parametre.rente,
+                    parametre.loebetid
+                );
+
+                /* afdrag = ydelse - renteudgiften (den del der faktisk bringer gælden ned. Math.max sikrer at afdrag aldrig er negativtt) */
+                afdrag = Math.max(0, maanedligYdelse - maanedligRente);
             }
 
-            /* Købsomkostninger tages med i første år, fordi de er engangsudgifter ved opstart. */
-            const koebsudgifterIAar = aar === 1 ? this.beregnSamledeKoebsudgifter(parametre) : 0;
+            /* --- Engangsudgifter --- */
 
-            /* Renovering tages kun med i det år, brugeren har angivet som renoveringstidspunkt. */
-            const renoveringsudgifterIAar =
-            aar === parametre.renoveringstidspunkt
-            ? parametre.planlagteRenoveringOgForbedringer
-            : 0;
+            /* alle købs-engangsudgifter (advokat, tinglysning osv.) trækkes kun i måned 1 */
+            const koebsudgifterIMaaned = maaned === 1 ? this.beregnSamledeKoebsudgifter(parametre) : 0;
 
-            /* Cashflow er indtægter minus udgifter.
-            Her medregnes lejeindtægter, drift, udlejning, låneydelse, køb og eventuel renovering. */
-            const cashflow = aarligLeje
-            - aarligeUdlejningsudgifter
-            - aarligeDriftomkostninger
-            - aarligeYdelse
-            - koebsudgifterIAar
-            renoveringsudgifterIAar;
+            /* renoveringsudgiften trækkes kun i den måned brugeren har angivet */
+            const renoveringsudgifterIMaaned = maaned === parametre.renoveringstidspunkt ? parametre.planlagteRenoveringOgForbedringer : 0;
 
+            /* --- Cashflow denne måned --- */
+
+            /* cashflow = alle indtægter - alle udgifter denne måned. 
+            Positivt cashflow = overskud, negativt = underskud */
+            const cashflow = maanedligLejeIndtægt
+                - maanedligeUdlejningsudgifter
+                - maanedligeDriftomkostninger
+                - maanedligYdelse
+                - koebsudgifterIMaaned
+                - renoveringsudgifterIMaaned;
+
+            /* akkumuleret cashflow summerer alle måneders cashflow fra start til nu */
+            akkumuleretCashflow += cashflow;
+
+            /* akkumuleret leje = samlet lejeindtægt fra start til nu = likviditetsholdning */
+            akkumuleretLeje += maanedligLejeIndtægt;
+
+            /* --- Opdater gæld --- */
+
+            /* gælden nedbringes med dette måneds afdrag. Math.max sikrer at gælden aldrig går i minus (fx sidst i løbetiden) */
             gaeld = Math.max(0, gaeld - afdrag);
 
-            /* I denne første version antager vi, at ejendommens værdi er konstant.
-            Egenkapital beregnes derfor som ejendomspris minus resterende gæld. */
-            const egenkapital = parametre.ejendomspris - gaeld;
+            /* --- Ejendomsværdi og egenkapital --- */
 
+            /* ejendomsværdien stiger med den månedlige faktor opløftet i antal måneder. Renters rente: jo flere måneder, jo større stigning */
+            const aktuelEjendomsvaerdi = parametre.ejendomspris
+                * Math.pow(1 + maanedligVaerdistigning, maaned);
+
+            /* aktiver = ejendomsværdi (i denne model ejer man kun ejendommen) */
+            const aktiver = aktuelEjendomsvaerdi;
+
+            /* egenkapital er hvad der er tilbage hvis man solgte ejendommen nu: ejendomsværdi minus restgæld, plus det akkumulerede cashflow. Akkumuleret cashflow medtages fordi det afspejler den reelle position, så man har enten tjent eller tabt disse penge løbende */
+            const egenkapital = aktuelEjendomsvaerdi - gaeld + akkumuleretCashflow;
+
+            /* gem denne måneds værdier i de fem tidsserier (Math.round fjerner decimaler) */
             cashflowOverTid.push(Math.round(cashflow));
             gaeldOverTid.push(Math.round(gaeld));
             egenkapitalOverTid.push(Math.round(egenkapital));
+            aktiverOverTid.push(Math.round(aktiver));
+            likviditetsholdningOverTid.push(Math.round(akkumuleretLeje));
         }
 
+        /* returner et SimuleringResultat-objekt med de fem færdige tidsserier */
         return new simuleringResultat(
             egenkapitalOverTid,
             cashflowOverTid,
-            gaeldOverTid
+            gaeldOverTid,
+            aktiverOverTid,
+            likviditetsholdningOverTid
         );
     }
 
-    /* beregnSamledeKoebsudgifter() samler alle købsrelaterede engangsudgifter.
-    Den er lavet som en separat metode for at undgå at gentage samme udregning inde i løkken. */
+    /* beregnSamledeKoebsudgifter() samler alle købsrelaterede engangsudgifter. Den er lavet som en separat metode for at undgå at gentage samme udregning inde i løkken. */
     beregnSamledeKoebsudgifter(parametre) {
         return parametre.koebsomkostninger
         + parametre.advokatudgifter
@@ -114,8 +187,7 @@ class Simulering {
         + parametre.overtagelsesudgifter;
     }
 
-     /* validerParametre() sikrer, at simuleringen ikke køres med manglende eller ugyldige hovedtal.
-    Det passer til opgavens krav om validering og fejlhåndtering. */
+    /* validerParametre() sikrer at simuleringen ikke køres med manglende eller ugyldige hovedtal */
     validerParametre(parametre) {
         if (!parametre) {
             throw new Error('Investeringsparametre mangler');
@@ -135,6 +207,16 @@ class Simulering {
 
         if (!parametre.loebetid || parametre.loebetid <= 0) {
             throw new Error('Løbetid skal være større end 0');
+        }
+
+        if (parametre.afdragsfriPeriode > parametre.loebetid) {
+            throw new Error('Afdragsfri periode må ikke overstige løbetid');
+        }
+
+        if (parametre.udlejningMaanederAarligt != null) {
+            if (parametre.udlejningMaanederAarligt < 1 || parametre.udlejningMaanederAarligt > 12) {
+                throw new Error('Antal måneder til udlejning skal være mellem 1 og 12');
+            }
         }
 
         if (!this.tidshorisont || this.tidshorisont <= 0) {

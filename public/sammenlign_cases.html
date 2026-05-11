@@ -28,9 +28,29 @@
     </div>
   </nav>
 
-  <!-- INDHOLD -->
-  <section>
-    <h1>Sammenlign Cases</h1>
+  <!-- SAMMENLIGN CASES INDHOLD -->
+  <section class="portefølje-sektion">
+
+    <div class="portefølje-header">
+      <h1 class="portefølje-titel">Sammenlign Cases</h1>
+      <p class="portefølje-brodtekst">Vælg to eller flere investeringscases og en tidshorisont for at sammenligne deres udvikling i samme diagram.</p>
+    </div>
+
+    <hr class="portefølje-divider">
+
+    <div class="sammenlign-kontrol">
+      <div class="sammenlign-kontrol-top">
+        <select id="sammenlign-dropdown" class="simuler-dropdown" multiple size="4"></select>
+        <p class="modal-felt-beskrivelse sammenlign-hjælp">Hold Cmd (Mac) eller Ctrl (Windows) for at vælge flere cases.</p>
+      </div>
+      <div class="simuler-kontrol-række">
+        <input type="number" id="sammenlign-tidshorisont" class="simuler-input" min="30" step="1" placeholder="Min. 30 år">
+        <button id="sammenlign-knap" class="simuler-knap" disabled>Sammenlign</button>
+      </div>
+    </div>
+
+    <div id="sammenlign-resultater"></div>
+
   </section>
 
   <!-- FOOTER -->
@@ -60,15 +80,16 @@
       <div class="footer-kolonne">
         <h4 class="footer-overskrift">SOCIALE MEDIER</h4>
         <ul class="footer-liste">
-          <li><a href="#">LinkedIn</a></li>
-          <li><a href="#">Instagram</a></li>
-          <li><a href="#">Twitter / X</a></li>
+          <li>LinkedIn</li>
+          <li>Instagram</li>
+          <li>Twitter / X</li>
         </ul>
       </div>
     </div>
     <div class="footer-streg"></div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/sammenlign_cases.js"></script>
 
 </body>

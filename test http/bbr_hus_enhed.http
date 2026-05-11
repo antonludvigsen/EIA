@@ -7,7 +7,7 @@
 ## /enhed
 ## Bygning="id_lokalId"
 
-GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/enhed?bygning=a7f0d0aa-d74c-4750-809a-02a781624dc1&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
+GET https://services.datafordeler.dk/BBR/BBRPublic/1/REST/enhed?bygning=449524eb-1dab-4b37-89fd-d30548070d15&username=WWCHFFIZAW&password=PROGeksamen2026!&format=JSO
 
 ## Output:
 

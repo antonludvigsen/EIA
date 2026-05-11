@@ -1,66 +1,49 @@
 
-/* InvesteringsParametre repræsenterer de økonomiske input, som brugeren indtaster i den guidede investeringsformular.
-Klassen samler køb, finansiering, renovering, drift og udlejning i ét objekt, så Simulering senere kan beregne cashflow, gæld og egenkapital ud fra de samme data. */
+/* InvesteringsParametre repræsenterer de økonomiske input, som brugeren indtaster i den guidede investeringsformular. 
+
+Klassen samler køb, finansiering, renovering, drift og udlejning i et objekt, så Simulering.eksekver() kan beregne cashflow, gæld, egenkapital, likvid og aktiver ud fra de samme data. 
+
+Konstruktøren sætter standardværdier for valgfrie felter
+hentData() eksporterer alle felter som et plain objekt
+opdater() opdaterer felterne med nye data */
 
 class InvesteringsParametre {
     constructor(data) {
-        /* ejendomspris bruges til at beregne egenkapitalen over tid */
-        this.ejendomspris = data.ejendomspris;
 
-        /* koebsomkostninger er ekstra omkostninger ved køb, fx rådgivning og gebyrer */
-        this.koebsomkostninger = data.koebsomkostninger || 0;
+        /* --- Køb --- */
 
-        /* advokatudgifter er udgifter til juridisk rådgivning ved køb */
-        this.advokatudgifter = data.advokatudgifter || 0;
-
-        /* tinglysningsudgifter er offentlige/gebyrmæssige udgifter ved registrering af køb/lån */
-        this.tinglysningsudgifter = data.tinglysningsudgifter || 0;
-
-        /* overtagelsesudgifter dækker øvrige udgifter i forbindelse med overtagelse */
-        this.overtagelsesudgifter = data.overtagelsesudgifter || 0;
+        this.ejendomspris = data.ejendomspris; /* ejendomspris bruges til at beregne egenkapitalen over tid */
+        this.koebsomkostninger = data.koebsomkostninger || 0; /* koebsomkostninger er ekstra omkostninger ved køb, fx rådgivning og gebyrer */
+        this.advokatudgifter = data.advokatudgifter || 0; /* advokatudgifter er udgifter til juridisk rådgivning ved køb */
+        this.tinglysningsudgifter = data.tinglysningsudgifter || 0; /* tinglysningsudgifter er offentlige/gebyrmæssige udgifter ved registrering af køb/lån */
+        this.overtagelsesudgifter = data.overtagelsesudgifter || 0; /* overtagelsesudgifter dækker øvrige udgifter i forbindelse med overtagelse */
 
         /* --- Finansiering og lån --- */
 
-        /* laanebeloeb er det beløb brugeren finansierer gennem lån */
-        this.laanebeloeb = data.laanebeloeb;
-
-        /* rente gemmes som procent, fx 4 for 4% */
-        this.rente = data.rente;
-
-        /* loebetid er lånets løbetid i år, fx 30 */
-        this.loebetid = data.loebetid;
-
-        /* afdragsfriPeriode angiver hvor mange år der ikke afdrages på lånet */
-        this.afdragsfriPeriode = data.afdragsfriPeriode || 0;
-
-        /* laanetype er et informationsfelt, fx Realkreditlaan eller Banklaan */
-        this.laanetype = data.laanetype || 'Realkreditlaan';
+        this.laanebeloeb = data.laanebeloeb; /* laanebeloeb er det beløb brugeren finansierer gennem lån */
+        this.rente = data.rente; /* rente gemmes som procent, fx 4 for 4% */
+        this.loebetid = data.loebetid; /* loebetid er lånets løbetid i måneder, fx 360 */
+        this.afdragsfriPeriode = data.afdragsfriPeriode || 0; /* afdragsfriPeriode angiver hvor mange måneder der ikke afdrages på lånet */
+        this.laanetype = data.laanetype || 'Realkreditlaan'; /* laanetype er et informationsfelt, fx Realkreditlaan eller Banklaan */
 
         /* --- Renovering og forbedringer --- */
-        
-        /* planlagteRenoveringOgForbedringer er et samlet beløb for planlagte forbedringer */
-        this.planlagteRenoveringOgForberedringer = data.planlagteRenoveringOgForberedringer || 0;
 
-        /* renoveringstidspunkt angiver hvilket år renoveringen sker, fx år 5 */
-        this.renoveringstidspunkt = data.renoveringstidspunkt || null;
+        this.planlagteRenoveringOgForbedringer = data.planlagteRenoveringOgForbedringer || 0; /* planlagteRenoveringOgForbedringer er et samlet beløb for planlagte forbedringer */
+        this.renoveringstidspunkt = data.renoveringstidspunkt || null; /* renoveringstidspunkt angiver hvilken måned renoveringen sker, fx måned 24 */
 
         /* --- Drift --- */
 
-        /* driftsomkostninger er månedlige udgifter til drift af ejendommen */
-        this.driftsomkostninger = data.driftsomkostninger || 0;
+        this.driftsomkostninger = data.driftsomkostninger || 0; /* driftsomkostninger er månedlige udgifter til drift af ejendommen */
 
         /* --- Udlejning --- */
 
-        /* udlejning er true/false og angiver om ejendommen skal bruges til udlejning */
-        this.udlejning = data.udlejning || false;
-
-        /* maanedligLeje er den månedlige lejeindtægt, hvis ejendommen udlejes */
-        this.maanedligLeje = data.maanedligLeje || 0;
-
-        /* udlejningsudgifter er månedlige udgifter forbundet med udlejning */
-        this.udlejningsudgifter = data.udlejningsudgifter || 0;
+        this.udlejning = data.udlejning || false; /* udlejning er true/false og angiver om ejendommen skal bruges til udlejning */
+        this.maanedligLeje = data.maanedligLeje || 0; /* maanedligLeje er den månedlige lejeindtægt, hvis ejendommen udlejes */
+        this.udlejningsudgifter = data.udlejningsudgifter || 0; /* udlejningsudgifter er månedlige udgifter forbundet med udlejning */
+        this.udlejningMaanederAarligt = data.udlejningMaanederAarligt || 12; /* udlejningMaanederAarligt angiver hvor mange måneder ejendommen udlejes per år, fx 6 for halvårlig udlejning */
     }
 
+    /* hentData() returnerer alle felter som et plain JavaScript-objekt. Bruges når man skal sende parametrene videre til et eksternt lag (fx en API-respons eller repositoriet) uden at medsende klassens metoder */
     hentData() {
         return {
             ejendomspris: this.ejendomspris,
@@ -73,22 +56,20 @@ class InvesteringsParametre {
             loebetid: this.loebetid,
             afdragsfriPeriode: this.afdragsfriPeriode,
             laanetype: this.laanetype,
-            planlagteRenoveringOgForberedringer: this.planlagteRenoveringOgForberedringer,
+            planlagteRenoveringOgForbedringer: this.planlagteRenoveringOgForbedringer,
             renoveringstidspunkt: this.renoveringstidspunkt,
             driftsomkostninger: this.driftsomkostninger,
             udlejning: this.udlejning,
-            maanedligLeje: this.udlejning,
-            udlejningsudgifter: this.udlejningsudgifter
+            maanedligLeje: this.maanedligLeje,
+            udlejningsudgifter: this.udlejningsudgifter,
+            udlejningMaanederAarligt: this.udlejningMaanederAarligt
         }
     }
 
-    /* opdater() bruges hvis brugeren senere ændrer tal i investeringscasen.
-    Det passer til opgavekravet om, at tallene senere skal kunne ændres og beregnes igen. */
+    /* opdater() overskriver eksisterende felter med nye værdier fra data-objektet. */
     opdater(data) {
-        Object.assign(this, data);
+        Object.assign(this, data); /* Object.assign kopierer kun de felter der faktisk er til stede i data. felter der ikke er med forbliver uændrede. */
     }
 }
 
 module.exports = InvesteringsParametre
-
-

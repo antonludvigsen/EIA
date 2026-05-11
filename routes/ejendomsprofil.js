@@ -1,6 +1,5 @@
 /* ejendomsprofil.js definerer de HTTP-endpoints der er tilgængelige under /api/ejendomsprofil/.
-   Hvert endpoint knyttes til en metode i controlleren — routerne indeholder ingen forretningslogik,
-   de videredelegerer blot kaldet til den rette controller-metode. */
+Routerne indeholder, ligesom fra adresse.js, ingen forretningslogik. De kalder nemlig bare på controlleren*/
 
 const express = require('express');
 const router = express.Router();
@@ -23,5 +22,8 @@ router.delete('/slet/:id', ejendomsprofilController.sletEjendomsprofil);
 
 /* POST /api/ejendomsprofil/dupliker/:id */
 router.post('/dupliker/:id', ejendomsprofilController.duplikerEjendomsprofil);
+
+/* GET /api/ejendomsprofil/ejendomsdata/:id */
+router.get('/ejendomsdata/:id', ejendomsprofilController.hentEjendomsdata);
 
 module.exports = router;
