@@ -40,7 +40,7 @@ npm install
 
 ### 3. Opret .env-fil
 
-Opret en fil ved navn `.env` i projektets rod med følgende indhold: (SES I RAPPORTEN)
+Opret en fil ved navn `.env` i projektets rod med følgende indhold: (SES I RAPPORTEN UNDER BILAG)
 
 `.env`-filen er ekskluderet via `.gitignore` og må aldrig committes til repositoriet.
 
