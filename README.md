@@ -89,3 +89,30 @@ Applikationens hovedfunktioner kan afprøves i følgende rækkefølge:
 5. **Sammenlign cases:** Gå til "Sammenlign Cases", vælg to eller flere investeringscases og angiv en tidshorisont. Resultaterne vises som fem separate grafer og en sammenligningstabel.
 
 ## Projektstruktur
+
+EIA/
+├── server.js                    # Express-applikationens indgangspunkt
+├── database/
+│   ├── connection.js            # Azure SQL connection pool
+│   └── schema.sql               # Databaseskema
+├── domain/                      # Domænelogik (klasser)
+│   ├── simulering.js
+│   ├── simuleringResultat.js
+│   └── investeringsparametre.js
+├── services/                    # Integration med eksterne API'er
+│   ├── DAWA_API.js
+│   ├── BBR_API.js
+│   └── Kortdata_API.js
+├── controllers/                 # HTTP-lag
+├── repositories/                # Database-lag
+├── routes/                      # Express-routere
+├── public/                      # Statiske filer (HTML, CSS, klient-JS)
+├── tests/                       # Jest unit tests
+└── .env                         # Miljøvariabler (ikke i Git)
+
+## Kendte begrænsninger
+
+- Applikationen anvender én hardkodet bruger (brugerID = 1). Autentificering er bevidst udeladt og dokumenteret som afgrænsning.
+- Sammenligningsfunktionaliteten persisteres ikke i databasen i denne version. Den udføres udelukkende i frontend via parallelle simuleringskald.
+- Værdistigningen på ejendommen er fast sat til 4% årligt baseret på Nykredits prognose for det danske boligmarked, og kan ikke ændres af brugeren.
+
