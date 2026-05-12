@@ -12,6 +12,7 @@ class SimuleringResultat {
         aktiverOverTid,
         likviditetsholdningOverTid
     ) {
+        /* månedligt */
         this.egenkapitalOverTid         = egenkapitalOverTid;
         this.cashflowOverTid            = cashflowOverTid;
         this.gaeldOverTid               = gaeldOverTid;
@@ -19,15 +20,16 @@ class SimuleringResultat {
         this.likviditetsholdningOverTid = likviditetsholdningOverTid;
         this.genereretDato              = new Date();
 
-        this.egenkapitalAarligt         = this._sample(egenkapitalOverTid);
-        this.cashflowAarligt            = this._sample(cashflowOverTid);
-        this.gaeldAarligt               = this._sample(gaeldOverTid);
-        this.aktiverAarligt             = this._sample(aktiverOverTid);
-        this.likviditetsholdningAarligt = this._sample(likviditetsholdningOverTid);
+        /* årligt */
+        this.egenkapitalAarligt         = this.hentAarligeVaerdier(egenkapitalOverTid);
+        this.cashflowAarligt            = this.hentAarligeVaerdier(cashflowOverTid);
+        this.gaeldAarligt               = this.hentAarligeVaerdier(gaeldOverTid);
+        this.aktiverAarligt             = this.hentAarligeVaerdier(aktiverOverTid);
+        this.likviditetsholdningAarligt = this.hentAarligeVaerdier(likviditetsholdningOverTid);
     }
 
-    /* _sample() tager værdien ved slutningen af hvert år (index 11, 23, 35...) fra et månedligt array og returnerer et array med en værdi per år. Index 11 er december i år 1 (0-baseret), index 23 er december i år 2 osv. */
-    _sample(maanedligArray) {
+    /* hentAarligeVaerdier() tager værdien ved slutningen af hvert år (index 11, 23, 35...) fra et månedligt array og returnerer et array med en værdi per år. Index 11 er december i år 1 (0-baseret), index 23 er december i år 2 osv. */
+    hentAarligeVaerdier(maanedligArray) {
         const aarlige = [];
         for (let i = 11; i < maanedligArray.length; i += 12) {
             aarlige.push(maanedligArray[i]);

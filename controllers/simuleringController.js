@@ -44,7 +44,7 @@ class SimuleringController {
             const parametre = {
                 ...raaParametre, /* Vi bruger spread-operatoren for at bevare felter uændrede */
                 afdragsfriPeriode: raaParametre.afdragsfriPeriode ?? 0,
-                driftsomkostninger: raaParametre.driftsomkostninger               ?? 0,
+                driftsomkostninger: raaParametre.driftsomkostninger ?? 0,
                 koebsomkostninger: raaParametre.koebsomkostninger ?? 0,
                 advokatudgifter: raaParametre.advokatudgifter ?? 0,
                 tinglysningsudgifter: raaParametre.tinglysningsudgifter ?? 0,
